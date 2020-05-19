@@ -5,28 +5,16 @@ const app = express();
 
 app.use(express.json());
 
-// //get the (root url) data by sending a req(request) to get back response
-// app.get('/', (req, res) => {
-//   res
-//     .status(200)
-//     .json({ message: 'Hello from the server side!', app: 'Natours' });
-// });
-// //post data to (root url) by sending a req(request) and get back response
-// app.post('/', (req, res) => {
-//   res.send('You can post this endpoint...');
-// });
-
-//
-
 //without the JSON,parse the file is nothing but text, now its an array of objects
 const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
+  fs.readFileSync(
+    `${__dirname}/dev-data/data/tours-simple.json`
+  )
 );
 
-//if there is a request to get(read) data of url, then respond with...
-app.get('/api/v1/tours', (req, res) => {
+const getAllTour = (req, res) => {
   /*send back the response as a json object(specially for 'status')
-because 'tours' is already one */
+  because 'tours' is already one */
   res.status(200).json({
     status: 'success',
     results: tours.length,
@@ -34,15 +22,17 @@ because 'tours' is already one */
       tours: tours,
     },
   });
-});
+};
 
-app.get('/api/v1/tours/:id', (req, res) => {
+getTour = (req, res) => {
   // console.log(req.params);
 
   //when multiply a string it will convert it into a number
   const id = req.params.id * 1;
   //loop through the array and if false then that element will be removed
-  const tour = tours.find((element) => element.id === id);
+  const tour = tours.find(
+    (element) => element.id === id
+  );
 
   if (!tour) {
     return res.status(404).json({
@@ -51,21 +41,22 @@ app.get('/api/v1/tours/:id', (req, res) => {
     });
   }
 
-
   res.status(200).json({
     status: 'success',
     data: {
       tour,
     },
   });
-});
+};
 
-//if there is a request to post(create) data to url, then respond with...
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
   // console.log(req.body);
 
   const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
+  const newTour = Object.assign(
+    { id: newId },
+    req.body
+  );
 
   //push new object into array 'tours' which can be used to update
   tours.push(newTour);
@@ -84,42 +75,55 @@ app.post('/api/v1/tours', (req, res) => {
       });
     }
   );
-});
+};
 
-app.patch('/api/v1/tours/:id', (req,res)=>{
-    if(req.params.id*1 > (tours.length -1)){
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Invalid ID'
-      })
-    }
-
-    res.status(200).json({
-      status: 'success',
-      data:{
-        tour: '<Updated tour here...>'
-      }
-    })
-
-})
-
-
-app.delete('/api/v1/tours/:id', (req,res)=>{
-  if(req.params.id*1 > (tours.length -1)){
+const updateTour = (req, res) => {
+  if (req.params.id * 1 > tours.length - 1) {
     return res.status(404).json({
       status: 'fail',
-      message: 'Invalid ID'
-    })
+      message: 'Invalid ID',
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: '<Updated tour here...>',
+    },
+  });
+};
+
+deleteTour = (req, res) => {
+  if (req.params.id * 1 > tours.length - 1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
   }
 
   res.status(204).json({
     status: 'success',
-    data: null
-  })
-  
-})
+    data: null,
+  });
+};
 
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
 
+//if there is a request to post(create) data to url, then respond with...
+app
+  .route('/api/v1/tours')
+  .get(getAllTours)
+  .post(createTour);
+//if there is a request to get(read) data of url, then respond with...
+app
+  .route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 const port = 3000;
 app.listen(port, () => {
