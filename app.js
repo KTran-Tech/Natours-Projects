@@ -1,9 +1,26 @@
 const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
 
 const app = express();
 
+// 1) MIDDLEWARES
+
+//
+app.use(morgan('dev'));
+// recognize the incoming Request Object as a JSON Object
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log('Hello from the middleware 👋');
+  next();
+});
+
+app.use((req, res, next) => {
+  //initialize a property with value of current time in req object
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 //without the JSON,parse the file is nothing but text, now its an array of objects
 const tours = JSON.parse(
@@ -16,13 +33,15 @@ const tours = JSON.parse(
 
 //
 
-//
+// 2) ROUTE HANDLERS
 
 const getAllTour = (req, res) => {
+  console.log(req.requestTime);
   /*send back the response as a json object(specially for 'status')
   because 'tours' is already one */
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestTime,
     results: tours.length,
     data: {
       tours: tours,
@@ -119,6 +138,8 @@ deleteTour = (req, res) => {
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
 
+// 3) ROUTES
+
 //if there is a request to post(create) data to url, then respond with...
 app
   .route('/api/v1/tours')
@@ -131,6 +152,7 @@ app
   .patch(updateTour)
   .delete(deleteTour);
 
+// 4) START SERVER
 const port = 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}....`);

@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/KTran-Tech/North-America-Tour#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "nodeman": "^1.1.2"
