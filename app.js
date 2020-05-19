@@ -12,6 +12,12 @@ const tours = JSON.parse(
   )
 );
 
+//
+
+//
+
+//
+
 const getAllTour = (req, res) => {
   /*send back the response as a json object(specially for 'status')
   because 'tours' is already one */
@@ -116,7 +122,7 @@ deleteTour = (req, res) => {
 //if there is a request to post(create) data to url, then respond with...
 app
   .route('/api/v1/tours')
-  .get(getAllTours)
+  .get(getAllTour)
   .post(createTour);
 //if there is a request to get(read) data of url, then respond with...
 app
