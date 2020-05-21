@@ -1,19 +1,16 @@
 const express = require('express');
-const tourController = require('./../controllers/tourController');
+const tourController = require('../controllers/tourController');
 
 // #) ROUTES
 const router = express.Router();
 
-router.param('id', tourController.checkID);
+// router.param('id', tourController.checkID);
 
 //if there is a request to post(create) data to url, then respond with...
 router
   .route('/')
   .get(tourController.getAllTour)
-  .post(
-    tourController.checkBody,
-    tourController.createTour
-  );
+  .post(tourController.createTour);
 //if there is a request to get(read) data of url, then respond with...
 router
   .route('/:id')
