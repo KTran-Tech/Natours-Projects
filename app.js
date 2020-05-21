@@ -8,11 +8,16 @@ const app = express();
 
 // #) MIDDLEWARES
 
-//
-//allows you to see request data right in the console
-app.use(morgan('dev'));
+//if the current environment is in development then...
+if (process.env.NODE_ENV === 'development') {
+  //allows you to see request data right in the console
+  //e.g: GET /api/v1/tours 200 24.046 ms - 8747
+  app.use(morgan('dev'));
+}
+
 // recognize the incoming Request Object as a JSON Object
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
   console.log('Hello from the middleware 👋');
