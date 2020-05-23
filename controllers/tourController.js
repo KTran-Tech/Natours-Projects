@@ -9,20 +9,21 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-// //without the JSON,parse the file is nothing but text, now its an array of objects
-// const tours = JSON.parse(
-//   fs.readFileSync(
-//     `${__dirname}/../dev-data/data/tours-simple.json`
-//   )
-// );
+//
 
-// #) ROUTE HANDLERS
+//
 
-exports.getAllTour = async (req, res) => {
-  try {
-    //Build Query
+//
+
+class APIFeatures {
+  constructor(query, queryString) {
+    this.query = query;
+    this.queryString = queryString;
+  }
+
+  filter() {
     // 1A) Filtering
-    const queryObj = { ...req.query };
+    const queryObj = { ...this.queryString };
     const excludedFields = [
       'page',
       'sort',
@@ -47,60 +48,108 @@ exports.getAllTour = async (req, res) => {
 
     //find '$lt': '1500' and use that to filter,
     //query could then be chained with other logic(add onto the change we did)
-    let query = Tour.find(JSON.parse(queryStr));
+    // const query = Tour.find(JSON.parse(queryStr));
+    this.query = this.query.find(
+      JSON.parse(queryStr)
+    );
 
-    // 2) Sorting
+    //"this" is the entire object
+    return this;
+  }
 
+  sort() {
     //continue chaining the change we did to query
     //if request.query has a sort property,
-    if (req.query.sort) {
+    if (this.queryString.sort) {
       //select only that specific property and nothing after it
       //"sort=price,ratingsAverage" we sort with price first
-      const sortBy = req.query.sort
+      const sortBy = this.queryString.sort
         .split(',')
         .join(' ');
-      query = query.sort(sortBy);
+      this.query = this.query.sort(sortBy);
       //"sort=price ratingsAverage"
     } else {
       //created at specific time sort
-      query = query.sort('-createdAt');
+      this.query = this.query.sort('-createdAt');
     }
 
+    //"this" is the entire object
+    return this;
+  }
+
+  limitFields() {
     // 3) Field limiting
     //field limiting means displaying only specific properties
-    if (req.query.fields) {
+    if (this.queryString.fields) {
       //select only that specific property and nothing after it
       //output "name duration difficulty price"
-      const fields = req.query.fields
+      const fields = this.queryString.fields
         .split(',')
         .join(' ');
       //'select' mean only output the fields and with logic from query
-      query = query.select(fields);
+      this.query = this.query.select(fields);
     } else {
-      query = query.select('-__v');
+      this.query = this.query.select('-__v');
     }
+    //"this" is the entire object
+    return this;
+  }
 
+  paginate() {
     // 4) Pagination
     //a nice way to turn string into a number
     //if there is no page info then default to 1 or 100
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 100;
+    const page = this.queryString.page * 1 || 1;
+    const limit =
+      this.queryString.limit * 1 || 100;
     //formula for page skipping, no need to memorize
     const skip = (page - 1) * limit;
     //'limit' is the amount of results you want
-    query = query.skip(skip).limit(limit);
+    this.query = this.query
+      .skip(skip)
+      .limit(limit);
 
-    if (req.query.page) {
-      const numTours = await Tour.countDocuments();
-      //if more skips than number of tours, than output
-      if (skip >= numTours)
-        throw new Error(
-          'This page does not exist'
-        );
-    }
+    //"this" is the entire object
+    return this;
+  }
+}
 
-    //execute query
-    const tours = await query;
+// //without the JSON,parse the file is nothing but text, now its an array of objects
+// const tours = JSON.parse(
+//   fs.readFileSync(
+//     `${__dirname}/../dev-data/data/tours-simple.json`
+//   )
+// );
+
+//
+
+//
+
+//
+
+//
+
+//
+
+exports.getAllTour = async (req, res) => {
+  try {
+    //EXECUTE QUERY
+    //Literally passing in the method .Find()
+    const features = new APIFeatures(
+      Tour.find(),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await features.query;
+
+    //
+
+    //
+
+    //
 
     // console.log(req.query);
     // console.log(req.query, queryObj);
@@ -126,6 +175,18 @@ exports.getAllTour = async (req, res) => {
     });
   }
 };
+
+//
+
+//
+
+//
+
+//
+
+//
+
+//
 
 exports.getTour = async (req, res) => {
   try {
