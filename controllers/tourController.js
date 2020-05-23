@@ -73,8 +73,11 @@ exports.getAllTour = async (req, res) => {
     }
 
     // 4) Pagination
+    //a nice way to turn string into a number
+    //if there is no page info then default to 1 or 100
     const page = req.query.page * 1 || 1;
     const limit = req.query.limit * 1 || 100;
+    //formula for page skipping, no need to memorize
     const skip = (page - 1) * limit;
     //'limit' is the amount of results you want
     query = query.skip(skip).limit(limit);
