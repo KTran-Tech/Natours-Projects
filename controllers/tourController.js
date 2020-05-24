@@ -170,9 +170,11 @@ exports.getTourStats = async (req, res) => {
   try {
     const stats = await Tour.aggregate([
       {
+        //only select documents with ratings great than or equal to...
         $match: { ratingsAverage: { $gte: 4.5 } },
       },
       {
+        //SORT BY GROUP like price, difficulty, ect
         $group: {
           //aggregate all data to each one only with exact difficulty level or ratingsAverage
           _id: { $toUpper: '$difficulty' },
@@ -182,14 +184,20 @@ exports.getTourStats = async (req, res) => {
             $sum: '$ratingsQuantity',
           },
           avgRatings: { $avg: '$ratingsAverage' },
-          avePrice: { $avg: '$price' },
+          avgPrice: { $avg: '$price' },
           minPrice: { $min: '$price' },
           maxPrice: { $max: '$price' },
         },
       },
+      //SORT BY AVG PRICE
       {
+        //sort data by average price
         $sort: { avgPrice: 1 },
       },
+      // {
+      //   //Including everything EXCEPT 'EASY'
+      //   $match: { _id: { $ne: 'EASY' } },
+      // },
     ]);
 
     //
@@ -198,6 +206,75 @@ exports.getTourStats = async (req, res) => {
       status: 'success',
       data: {
         stats,
+      },
+    });
+    //
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    //transform the parameter :year into a number
+    // 2021
+    const year = req.params.year * 1;
+
+    const plan = await Tour.aggregate([
+      {
+        //the  "$unwind: '$startDates'" itself target startDates and get rid of its array and display only ONE
+        $unwind: '$startDates',
+      },
+      {
+        //match results that are only tours that are in 2021
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        //SORT BY GROUP like price, difficulty, ect. This is creating as many possibilities as possible but the id can never the exact
+        $group: {
+          //group all of them by exact month
+          _id: { $month: '$startDates' },
+          //add up total of tour that starts that month
+          numTourStarts: { $sum: 1 },
+          //create an array with their tour name
+          tours: { $push: '$name' },
+        },
+      },
+      {
+        //aditional data to be displayed
+        $addFields: {
+          month: '$_id',
+        },
+      },
+      {
+        //0 or 1, this will determine if _id will be projected to the user
+        $project: {
+          _id: 0,
+        },
+      },
+      {
+        //month with most tours will be displayed first
+        $sort: { numTourStarts: -1 },
+      },
+      {
+        $limit: 12,
+      },
+    ]);
+
+    //
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        plan,
       },
     });
     //

@@ -17,6 +17,10 @@ router
   .route('/tour-stats')
   .get(tourController.getTourStats);
 
+router
+  .route('/monthly-plan/:year')
+  .get(tourController.getMonthlyPlan);
+
 //if there is a request to post(create) data to url, then respond with...
 router
   .route('/')
