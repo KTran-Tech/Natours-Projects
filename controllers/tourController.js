@@ -165,6 +165,7 @@ exports.deleteTour = async (req, res) => {
 
 //
 
+//To aggregate(add all the data together into one, to get an average or sum of everything)
 exports.getTourStats = async (req, res) => {
   try {
     const stats = await Tour.aggregate([
@@ -173,12 +174,21 @@ exports.getTourStats = async (req, res) => {
       },
       {
         $group: {
-          _id: null,
-          avgRating: { $avg: '$ratingsAverage' },
+          //aggregate all data to each one only with exact difficulty level or ratingsAverage
+          _id: { $toUpper: '$difficulty' },
+          // _id: '$ratingsAverage',
+          numTours: { $sum: 1 },
+          numRatings: {
+            $sum: '$ratingsQuantity',
+          },
+          avgRatings: { $avg: '$ratingsAverage' },
           avePrice: { $avg: '$price' },
           minPrice: { $min: '$price' },
           maxPrice: { $max: '$price' },
         },
+      },
+      {
+        $sort: { avgPrice: 1 },
       },
     ]);
 
