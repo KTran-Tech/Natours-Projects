@@ -13,6 +13,10 @@ router
     tourController.getAllTour
   );
 
+router
+  .route('/tour-stats')
+  .get(tourController.getTourStats);
+
 //if there is a request to post(create) data to url, then respond with...
 router
   .route('/')
