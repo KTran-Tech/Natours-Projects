@@ -41,6 +41,12 @@ const tourSchema = new mongoose.Schema(
         true,
         'A tour must have difficulty',
       ],
+      //this is only for string
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        message:
+          'Difficulty is either: easy, medium, difficult',
+      },
     },
     ratingsAverage: {
       type: Number,
@@ -149,6 +155,7 @@ tourSchema.pre('aggregate', function (next) {
     $match: { secretTour: { $ne: true } },
   });
   console.log(this.pipeline());
+
   next();
 });
 
