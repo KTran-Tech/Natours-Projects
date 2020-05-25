@@ -73,6 +73,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -100,6 +104,26 @@ tourSchema.pre('save', function (next) {
 });
 //DOCUMENT MIDDLEWARE, 'post' means to happen after saving the document
 // tourSchema.post('save', function (doc, next) {});
+
+//
+
+//
+
+//
+
+// QUERY MIDDLEWARE
+//'find' pointing to the current query
+// /^find/ mean anything that starts with 'find'
+tourSchema.pre(/^find/, function (next) {
+  //Display only the SectretTours that are not set to 'true' and dont display
+  this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(docs);
+  next();
+});
 
 //collection name and schema
 const Tour = mongoose.model('Tour', tourSchema);
