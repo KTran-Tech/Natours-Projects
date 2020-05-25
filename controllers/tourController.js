@@ -222,7 +222,7 @@ exports.getMonthlyPlan = async (req, res) => {
     //transform the parameter :year into a number
     // 2021
     const year = req.params.year * 1;
-
+    //To aggregate(add all the data together into one, to get an average or sum of everything)
     const plan = await Tour.aggregate([
       {
         //the  "$unwind: '$startDates'" itself target startDates and get rid of its array and display only ONE

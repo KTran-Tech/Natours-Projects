@@ -125,6 +125,15 @@ tourSchema.post(/^find/, function (docs, next) {
   next();
 });
 
+//AGGREGATION MIDDLEWARE
+//points to aggregation object
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({
+    $match: { secretTour: { $ne: true } },
+  });
+  next();
+});
+
 //collection name and schema
 const Tour = mongoose.model('Tour', tourSchema);
 
