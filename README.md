@@ -1,6 +1,7 @@
 # Title
 
-1) North-America-Tour
+North-America-Tour
+
 Tour Guide of North America Project using NodeJs/Express/MongoDB/Mongoose
 
 ## Getting Started
