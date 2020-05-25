@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 // A slug is a unique identifier for the resource of the url
 const slugify = require('slugify');
+const validator = require('validator');
 //schema(outline/model)
 //specify a schema for our data
 const tourSchema = new mongoose.Schema(
@@ -19,6 +20,10 @@ const tourSchema = new mongoose.Schema(
         10,
         'A tour name must have more or equal then 40 characters',
       ],
+      // validate: [
+      //   validator.isAlpha,
+      //   'Tour name must only contain characters',
+      // ],
     },
     slug: String,
     duration: {
@@ -62,7 +67,19 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      //this is a custom validaton
+      validate: {
+        validator: function (val) {
+          //this only points to current doc on NEW document creation and not .update()
+          //returns true or false
+          return val < this.price;
+        },
+        message:
+          'Discount price ({VALUE}) should be below regular price ',
+      },
+    },
     summary: {
       type: String,
       trim: true,
