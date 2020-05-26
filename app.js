@@ -49,6 +49,7 @@ app.all('*', (req, res, next) => {
   );
 });
 
+//if anyone of the valid routes return an error then it will have to be redirected to this
 app.use(globalErrorHandler);
 
 module.exports = app;

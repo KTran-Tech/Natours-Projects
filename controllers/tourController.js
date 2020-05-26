@@ -1,7 +1,7 @@
 // const fs = require('fs');
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
-
+const catchAsync = require('../utils/catchAsync');
 //
 
 exports.aliasTopTours = (req, res, next) => {
@@ -23,8 +23,8 @@ exports.aliasTopTours = (req, res, next) => {
 
 //
 
-exports.getAllTour = async (req, res) => {
-  try {
+exports.getAllTour = catchAsync(
+  async (req, res, next) => {
     //EXECUTE QUERY
 
     //Literally passing in the method .Find() to constructor
@@ -58,13 +58,8 @@ exports.getAllTour = async (req, res) => {
         tours,
       },
     });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
 //
 
@@ -78,8 +73,8 @@ exports.getAllTour = async (req, res) => {
 
 //
 
-exports.getTour = async (req, res) => {
-  try {
+exports.getTour = catchAsync(
+  async (req, res, next) => {
     const tour = await Tour.findById(
       req.params.id
     );
@@ -92,16 +87,11 @@ exports.getTour = async (req, res) => {
         tour,
       },
     });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
-exports.createTour = async (req, res) => {
-  try {
+exports.createTour = catchAsync(
+  async (req, res, next) => {
     //create a new request body object data that usually comes with POST
     const newTour = await Tour.create(req.body);
 
@@ -111,17 +101,13 @@ exports.createTour = async (req, res) => {
         tour: newTour,
       },
     });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
-exports.updateTour = async (req, res) => {
-  //"new: true" its to allow you to return updated document
-  try {
+exports.updateTour = catchAsync(
+  async (req, res, next) => {
+    //"new: true" its to allow you to return updated document
+
     const tour = await Tour.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -136,28 +122,18 @@ exports.updateTour = async (req, res) => {
         tour,
       },
     });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
-exports.deleteTour = async (req, res) => {
-  try {
+exports.deleteTour = catchAsync(
+  async (req, res) => {
     await Tour.findByIdAndDelete(req.params.id);
     res.status(204).json({
       status: 'success',
       data: null,
     });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
 //
 
@@ -166,8 +142,8 @@ exports.deleteTour = async (req, res) => {
 //
 
 //To aggregate(add all the data together into one, to get an average or sum of everything)
-exports.getTourStats = async (req, res) => {
-  try {
+exports.getTourStats = catchAsync(
+  async (req, res, next) => {
     const stats = await Tour.aggregate([
       {
         //only select documents with ratings great than or equal to...
@@ -209,16 +185,11 @@ exports.getTourStats = async (req, res) => {
       },
     });
     //
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
-exports.getMonthlyPlan = async (req, res) => {
-  try {
+exports.getMonthlyPlan = catchAsync(
+  async (req, res, next) => {
     //transform the parameter :year into a number
     // 2021
     const year = req.params.year * 1;
@@ -278,10 +249,5 @@ exports.getMonthlyPlan = async (req, res) => {
       },
     });
     //
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
