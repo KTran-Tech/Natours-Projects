@@ -2,6 +2,8 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
+//404 error handler, ect.
+const AppError = require('../utils/appError');
 //
 
 exports.aliasTopTours = (req, res, next) => {
@@ -79,6 +81,20 @@ exports.getTour = catchAsync(
       req.params.id
     );
 
+    if (!tour) {
+      /* Params ID have a strict length that you cannot violate, e.g adding an additonal character (causing it to
+      no longer be considered an ID), or else it would throw an error, 
+      but if you were to change one of its character to something else then that ID
+      would still be an ID but an invalid nonexistent ID throwing the error below */
+      //return so that we dont output two responses and exit
+      return next(
+        new AppError(
+          'No tour found with that ID',
+          404
+        )
+      );
+    }
+
     /*send back the response as a json object(specially for 'status')
         because 'tours' is already one */
     res.status(200).json({
@@ -116,6 +132,21 @@ exports.updateTour = catchAsync(
         runValidators: true,
       }
     );
+
+    if (!tour) {
+      /* Params ID have a strict length that you cannot violate, e.g adding an additonal character (causing it to
+      no longer be considered an ID), or else it would throw an error, 
+      but if you were to change one of its character to something else then that ID
+      would still be an ID but an invalid nonexistent ID throwing the error below */
+      //return so that we dont output two responses and exit
+      return next(
+        new AppError(
+          'No tour found with that ID',
+          404
+        )
+      );
+    }
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -126,8 +157,25 @@ exports.updateTour = catchAsync(
 );
 
 exports.deleteTour = catchAsync(
-  async (req, res) => {
-    await Tour.findByIdAndDelete(req.params.id);
+  async (req, res, next) => {
+    const tour = await Tour.findByIdAndDelete(
+      req.params.id
+    );
+
+    if (!tour) {
+      /* Params ID have a strict length that you cannot violate, e.g adding an additonal character (causing it to
+      no longer be considered an ID), or else it would throw an error, 
+      but if you were to change one of its character to something else then that ID
+      would still be an ID but an invalid nonexistent ID throwing the error below */
+      //return so that we dont output two responses and exit
+      return next(
+        new AppError(
+          'No tour found with that ID',
+          404
+        )
+      );
+    }
+
     res.status(204).json({
       status: 'success',
       data: null,

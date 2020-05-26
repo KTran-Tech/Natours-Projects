@@ -1,3 +1,5 @@
+//for 404 Error
+
 class AppError extends Error {
   constructor(message, statusCode) {
     //Erorr is a built in class, so its calling a 'message' method that returns an error msg
