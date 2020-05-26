@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 // A slug is a unique identifier for the resource of the url
 const slugify = require('slugify');
-const validator = require('validator');
+// const validator = require('validator');
+
 //schema(outline/model)
 //specify a schema for our data
 const tourSchema = new mongoose.Schema(
