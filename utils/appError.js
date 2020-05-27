@@ -2,8 +2,8 @@
 
 class AppError extends Error {
   constructor(message, statusCode) {
-    //Erorr is a built in class, so its calling a 'message' method that returns an error msg
-    //gets back error message
+    //Error is a built in class, so its calling a 'message' method that returns an error msg
+    //gets back error message and displays it
     super(message);
 
     this.statusCode = statusCode;
