@@ -33,7 +33,22 @@ const server = app.listen(port, () => {
   console.log(`App running on port ${port}....`);
 });
 
+//Rejections from common promises
 process.on('unhandledRejection', (err) => {
+  console.log(
+    'UNCAUGHT EXCEPTION! 💥 SHUTTING DOWN...'
+  );
+  console.log(err.name, err.message);
+  server.cose(() => {
+    process.exit(1);
+  });
+});
+
+process.on('uncaughtException', (err) => {
+  console.log(
+    'UNCAUGHT EXCEPTION! 💥 SHUTTING DOWN...'
+  );
+  console.log(err.name, err.message);
   server.cose(() => {
     process.exit(1);
   });
