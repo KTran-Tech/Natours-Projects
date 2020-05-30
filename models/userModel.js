@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
+//Powerful ToolKit to Validate
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -24,8 +26,35 @@ const userSchema = new mongoose.Schema({
   },
   passwordConfirm: {
     type: String,
-    required: [true, 'A  must have a '],
+    required: [
+      true,
+      'A  must have a password Confirmation',
+    ],
+    validate: {
+      //Will only work on Create() and Save()
+      //pass the property for this object and check if...
+      validator: function (element) {
+        return element === this.password;
+      },
+      message: 'Passwords are not the same!',
+    },
   },
+});
+
+//its a perfect time to manipulate data through middleware, when data is sent
+//invoke this function 'pre' before, 'save' saving the data to the database
+userSchema.pre('save', async function (next) {
+  //if password has not been modified then call next middleware
+  if (!this.isModified('password')) return next();
+  //encrypt password with cost of 12
+  this.password = await bcrypt.hash(
+    this.password,
+    18
+  );
+  //delete password field
+  //this works because the password is only a required INPUT not required data to be pushed to database
+  this.passwordConfirm = undefined;
+  next();
 });
 //To set up a user for the model?
 const User = mongoose.model('User', userSchema);
