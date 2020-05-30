@@ -4,6 +4,14 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
 
+process.on('uncaughtException', (err) => {
+  console.log(
+    'UNCAUGHT EXCEPTION! 💥 SHUTTING DOWN...'
+  );
+  console.log(err.name, err.message);
+  process.exit(1);
+});
+
 const app = require('./app');
 
 //
@@ -35,16 +43,6 @@ const server = app.listen(port, () => {
 
 //Rejections from common promises
 process.on('unhandledRejection', (err) => {
-  console.log(
-    'UNCAUGHT EXCEPTION! 💥 SHUTTING DOWN...'
-  );
-  console.log(err.name, err.message);
-  server.cose(() => {
-    process.exit(1);
-  });
-});
-
-process.on('uncaughtException', (err) => {
   console.log(
     'UNCAUGHT EXCEPTION! 💥 SHUTTING DOWN...'
   );
