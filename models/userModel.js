@@ -49,7 +49,7 @@ userSchema.pre('save', async function (next) {
   //encrypt password with cost of 12
   this.password = await bcrypt.hash(
     this.password,
-    18
+    12
   );
   //delete password field
   //this works because the password is only a required INPUT not required data to be pushed to database
