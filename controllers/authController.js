@@ -3,6 +3,16 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+const signToken = (id) => {
+  return jwt.sign(
+    { id },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    }
+  );
+};
+
 exports.signup = catchAsync(
   async (req, res, next) => {
     //the create() will also add the data to the database
@@ -15,11 +25,7 @@ exports.signup = catchAsync(
       passwordConfirm: req.body.password,
     });
 
-    const token = jwt.sign(
-      { id: newUser._id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
+    const token = signToken(newUser._id);
 
     res.status(201).json({
       status: 'success',
@@ -31,23 +37,48 @@ exports.signup = catchAsync(
   }
 );
 
-exports.login = (req, res, next) => {
-  const { email, password } = req.body;
+exports.login = catchAsync(
+  async (req, res, next) => {
+    const { email, password } = req.body;
 
-  //1) Check if email and password exist
-  if (!email || !password) {
-    //call upon next middleware
-    next(
-      new AppError(
-        'Please provide email and password!',
-        400
-      )
-    );
+    //1) Check if email and password exist
+    if (!email || !password) {
+      //it is important to call a return so that the login function finishes right away
+      //call upon next middleware
+      return next(
+        new AppError(
+          'Please provide email and password!',
+          400
+        )
+      );
+    }
+    //2) Check if user exists && password is correct from database
+    const user = await User.findOne({
+      email,
+    }).select('+password');
+
+    if (
+      !user ||
+      !(await user.correctPassword(
+        password,
+        user.password
+      ))
+    ) {
+      //it is important to call a return so that the login function finishes right away
+      return next(
+        new AppError(
+          'Incorrect email or password',
+          401
+        )
+      );
+    }
+
+    //3) If everything works, send token to client
+    const token = signToken(user._id);
+    //
+    res.status(200).json({
+      status: 'success',
+      token,
+    });
   }
-  //3) If everything works, send token to client
-  const token = '';
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
-};
+);
