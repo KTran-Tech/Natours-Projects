@@ -82,3 +82,37 @@ exports.login = catchAsync(
     });
   }
 );
+
+exports.protect = catchAsync(
+  async (req, res, next) => {
+    // 1) Get token and check if its there
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith(
+        'Bearer'
+      )
+    ) {
+      // .split('') will will remove the space and create an array of the two
+      token = req.headers.authorization.split(
+        ''
+      )[1];
+    }
+
+    if (!token) {
+      return next(
+        new AppError(
+          'You are not logged in! Please log in to get access',
+          401
+        )
+      );
+    }
+    // 2) Verifify token
+
+    // 3) Check if user still exist
+
+    // 4) Check if user changed password after the token was issued
+
+    next();
+  }
+);

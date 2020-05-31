@@ -24,6 +24,7 @@ app.use(express.static(`${__dirname}/public`));
 app.use((req, res, next) => {
   //initialize a property with value of current time in req object
   req.requestTime = new Date().toISOString();
+  console.log(req.headers);
   next();
 });
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
+const authController = require('../controllers/authController');
 
 // #) ROUTES
 const router = express.Router();
@@ -24,7 +25,10 @@ router
 //if there is a request to post(create) data to url, then respond with...
 router
   .route('/')
-  .get(tourController.getAllTour)
+  .get(
+    authController.protect,
+    tourController.getAllTour
+  )
   .post(tourController.createTour);
 //if there is a request to get(read) data of url, then respond with...
 router
