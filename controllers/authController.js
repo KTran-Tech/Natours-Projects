@@ -26,6 +26,8 @@ exports.signup = catchAsync(
       email: req.body.email,
       password: req.body.password,
       passwordConfirm: req.body.password,
+      passwordChangedAt:
+        req.body.passwordChangedAt,
     });
 
     const token = signToken(newUser._id);
@@ -126,7 +128,7 @@ exports.protect = catchAsync(
     if (!freshUser) {
       return next(
         new AppError(
-          'The user beloning to the token no longer exist.',
+          'The user belonging to the token no longer exist.',
           401
         )
       );
