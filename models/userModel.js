@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same!',
     },
   },
+  passwordChangedAt: Date,
 });
 
 //its a perfect time to manipulate data through middleware, when data is sent
@@ -68,6 +69,15 @@ userSchema.methods.correctPassword = async function (
     candidatePassword,
     userPassword
   );
+};
+
+userSchema.methods.changedPasswordAfter = function (
+  JWTTimestamp
+) {
+  if (this.passwordChangedAt) {
+    console(this.passwordChangedAt, JWTTimestamp);
+  }
+  return false;
 };
 
 //To set up a user for the model?
