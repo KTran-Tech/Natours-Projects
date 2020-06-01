@@ -1,3 +1,6 @@
+//util already comes built-in with node
+const { promisify } = require('util');
+//Like a passport used for verification that come built-in already
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
@@ -95,7 +98,7 @@ exports.protect = catchAsync(
     ) {
       // .split('') will will remove the space and create an array of the two
       token = req.headers.authorization.split(
-        ''
+        ' '
       )[1];
     }
 
@@ -107,8 +110,12 @@ exports.protect = catchAsync(
         )
       );
     }
-    // 2) Verifify token
-
+    // 2) Verify token
+    const decoded = await promisify(jwt.verify)(
+      token,
+      process.env.JWT_SECRET
+    );
+    console.log(decoded);
     // 3) Check if user still exist
 
     // 4) Check if user changed password after the token was issued

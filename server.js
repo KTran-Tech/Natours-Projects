@@ -47,7 +47,7 @@ process.on('unhandledRejection', (err) => {
     'UNCAUGHT EXCEPTION! 💥 SHUTTING DOWN...'
   );
   console.log(err.name, err.message);
-  server.cose(() => {
+  server.close(() => {
     process.exit(1);
   });
 });
