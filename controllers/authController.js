@@ -86,6 +86,7 @@ exports.login = catchAsync(
   }
 );
 
+//get all tours
 exports.protect = catchAsync(
   async (req, res, next) => {
     // 1) Get token and check if its there
@@ -101,7 +102,7 @@ exports.protect = catchAsync(
         ' '
       )[1];
     }
-
+    //if the token doesnt not exist
     if (!token) {
       return next(
         new AppError(
@@ -110,13 +111,26 @@ exports.protect = catchAsync(
         )
       );
     }
-    // 2) Verify token
+    // 2) Verifies users token vs the server's JWT_SECRET (COMPARING THEM)
+    //if verification fails then the program stops and throws and error
     const decoded = await promisify(jwt.verify)(
       token,
       process.env.JWT_SECRET
     );
-    console.log(decoded);
+
     // 3) Check if user still exist
+    //grabs the VERIFIED user id from decoded, this will always be true because promisify makes sure...
+    const freshUser = await User.findById(
+      decoded.id
+    );
+    if (!freshUser) {
+      return next(
+        new AppError(
+          'The user beloning to the token no longer exist.',
+          401
+        )
+      );
+    }
 
     // 4) Check if user changed password after the token was issued
 
