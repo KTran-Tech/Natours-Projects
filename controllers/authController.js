@@ -27,6 +27,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const token = signToken(newUser._id);
 
+  //this is what you ONLY return back to user in JSON file
   res.status(201).json({
     status: 'success',
     token,
@@ -57,7 +58,8 @@ exports.login = catchAsync(async (req, res, next) => {
 
   //3) If everything works, send token to client
   const token = signToken(user._id);
-  //
+
+  //this is what you ONLY return back to user in JSON file
   res.status(200).json({
     status: 'success',
     token,
