@@ -197,7 +197,7 @@ exports.forgotPassword = catchAsync(
     }
     // 2) Generate the random reset token
     const resetToken = user.createPasswordResetToken();
-    //deactivate all validators before save
+    //deactivate all validators before saving data to database
     await user.save({
       validateBeforeSave: false,
     });
