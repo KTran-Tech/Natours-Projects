@@ -199,9 +199,9 @@ exports.forgotPassword = catchAsync(
     }
     // 2) Generate the random reset token
     const resetToken = user.createPasswordResetToken();
-    //the resetToken function changes the schema data, and to save that you have to save it here.
-    //validateBeforeSave() ---> deactivate all validators before saving data to database
+    //the resetToken function modifies the schema data, and to save that you have to save it here.
     await user.save({
+      //validateBeforeSave() ---> deactivate all validators before saving data to database
       validateBeforeSave: false,
     });
 
@@ -217,18 +217,34 @@ exports.forgotPassword = catchAsync(
     new password and passwordConirm to: ${resetURL}\nIf you didn't 
     forget your password, pleae ignore this email!`;
 
-    //Pass info into the function to send token and message to users email
-    await sendEmail({
-      email: user.email,
-      subject:
-        'Your password reset token (valid for 10 min)',
-      message,
-    });
+    try {
+      //Pass info into the function to send token and message to users email
+      await sendEmail({
+        email: user.email,
+        subject:
+          'Your password reset token (valid for 10 min)',
+        message,
+      });
 
-    res.status(200).json({
-      status: 'success',
-      message: 'Token sent to email!',
-    });
+      res.status(200).json({
+        status: 'success',
+        message: 'Token sent to email!',
+      });
+    } catch (err) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({
+        //validateBeforeSave() ---> deactivate all validators before saving data to database
+        validateBeforeSave: false,
+      });
+
+      return next(
+        new AppError(
+          'There was an error sending the email. Try again later!'
+        ),
+        500
+      );
+    }
   }
 );
 
