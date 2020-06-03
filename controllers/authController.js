@@ -187,7 +187,7 @@ exports.restrict = (...roles) => {
 exports.forgotPassword = catchAsync(
   async (req, res, next) => {
     // 1) Get users req.email and find one similar in database
-    //"User" references to the database
+    //"User" references the database
     const user = await User.findOne({
       email: req.body.email,
     });
@@ -202,7 +202,7 @@ exports.forgotPassword = catchAsync(
     }
     // 2) Generate the random reset token
     const resetToken = user.createPasswordResetToken();
-    //the resetToken function modifies the schema data, and to save that you have to save it here.
+    //The resetToken only modifies the schema document data, you have to have it to the database
     await user.save({
       //validateBeforeSave() ---> deactivate all validators before saving data to database
       validateBeforeSave: false,
@@ -236,6 +236,7 @@ exports.forgotPassword = catchAsync(
     } catch (err) {
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
+      //The commands above only modifies the schema document data, you have to have it to the database
       await user.save({
         //validateBeforeSave() ---> deactivate all validators before saving data to database
         validateBeforeSave: false,
@@ -263,11 +264,31 @@ exports.resetPassword = catchAsync(
       .update(req.params.token)
       .digest('hex');
 
-    //"User" references to the database
+    //"User" references the database
+    //finds to see if the same encrypted token exists in the database
     const user = await User.findOne({
-      passwordResetToken: hasedToken,
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
     });
-    // 2) If token has not expired, user still exists in database, set the new password
+    // 2) If token has not expired and user still exists in the database, set the new password
+
+    //if the data cease to be false, error message
+    if (!user) {
+      return next(
+        new AppError(
+          'Token is invalid or has expired',
+          400
+        )
+      );
+    }
+    //officially modify the old password to the new reset password and other properties
+    user.password = req.body.password;
+    user.passwordConfirm =
+      req.body.passwordConfirm;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    //The commands above only modifies the schema document data, you have to save it
+    await user.save();
     // 3) Update changedPasswordAt property for the user
     // 4) Log the user in, sends new JWT
   }
