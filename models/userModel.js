@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 //Powerful ToolKit to Validate
 const validator = require('validator');
@@ -51,6 +52,8 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
+  passwordChangedAtRestToken: String,
+  passwordRestExpires: Date,
 });
 
 //its a perfect time to manipulate data through middleware, when data is sent
@@ -80,7 +83,7 @@ userSchema.methods.correctPassword = async function (
     userPassword
   );
 };
-
+//Tells you if passwod has been changed (by using dates)
 userSchema.methods.changedPasswordAfter = function (
   JWTTimestamp
 ) {
@@ -96,6 +99,18 @@ userSchema.methods.changedPasswordAfter = function (
   }
   //false means password not changed
   return false;
+};
+
+//Tells if you did a password reset with new token
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto
+    .randomBytes(32)
+    .toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
 };
 
 //To set up a user for the model?
