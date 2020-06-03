@@ -52,8 +52,8 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
-  passwordChangedAtRestToken: String,
-  passwordRestExpires: Date,
+  passwordResetExpires: Date,
+  passwordResetToken: String,
 });
 
 //its a perfect time to manipulate data through middleware, when data is sent
@@ -73,6 +73,7 @@ userSchema.pre('save', async function (next) {
 });
 
 //these tools are built-in with mongoose so you could use anytime
+//You have to specify to the schema that you are building a method
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
@@ -84,6 +85,7 @@ userSchema.methods.correctPassword = async function (
   );
 };
 //Tells you if passwod has been changed (by using dates)
+//You have to specify to the schema that you are building a method
 userSchema.methods.changedPasswordAfter = function (
   JWTTimestamp
 ) {
@@ -102,22 +104,24 @@ userSchema.methods.changedPasswordAfter = function (
 };
 
 //Tells if you did a password reset with new token
+//You have to specify to the schema that you are building a method
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto
     .randomBytes(32)
     .toString('hex');
-
+  //change current property to this
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
+  //change current property to this
+  this.passwordResetExpires =
+    Date.now() + 10 + 60 + 1000;
 
   console.log(
     { resetToken },
     this.passwordResetToken
   );
-  this.passwordResetExpires =
-    Date.now() + 10 + 60 + 1000;
 
   return resetToken;
 };
