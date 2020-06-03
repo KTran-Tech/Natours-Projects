@@ -10,11 +10,11 @@ router.post('/login', authController.login);
 
 router.post(
   '/forgotPassword',
-  authController.login
+  authController.forgotPassword
 );
 router.post(
   '/resetPassword',
-  authController.login
+  authController.resetPassword
 );
 
 router

@@ -196,7 +196,11 @@ exports.forgotPassword = catchAsync(
       );
     }
     // 2) Generate the random reset token
-
+    const resetToken = user.createPasswordResetToken();
+    //deactivate all validators before save
+    await user.save({
+      validateBeforeSave: false,
+    });
     // 3) Send it to
   }
 );
