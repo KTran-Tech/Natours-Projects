@@ -12,8 +12,8 @@ router.post(
   '/forgotPassword',
   authController.forgotPassword
 );
-router.post(
-  '/resetPassword',
+router.patch(
+  '/resetPassword/:token',
   authController.resetPassword
 );
 

@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const sendEmail = require('../utils/email');
 
 const signToken = (id) => {
   return jwt.sign(
@@ -182,11 +183,12 @@ exports.restrict = (...roles) => {
 
 exports.forgotPassword = catchAsync(
   async (req, res, next) => {
-    // 1) Get user based on POSTed email
+    // 1) Get users req.email and find one similar in database
     //"User" refers to the database
     const user = await User.findOne({
       email: req.body.email,
     });
+    //if users email in database does not exist, error message
     if (!user) {
       return next(
         new AppError(
@@ -197,11 +199,36 @@ exports.forgotPassword = catchAsync(
     }
     // 2) Generate the random reset token
     const resetToken = user.createPasswordResetToken();
-    //deactivate all validators before saving data to database
+    //the resetToken function changes the schema data, and to save that you have to save it here.
+    //validateBeforeSave() ---> deactivate all validators before saving data to database
     await user.save({
       validateBeforeSave: false,
     });
-    // 3) Send it to
+
+    // 3) Send it to user's email
+
+    //This is the url for resetting the password
+    //protocal means "http/https", host means domain name
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/users/resetPassword/${resetToken}`;
+    //This is the message sent privately to users email containing the reset url
+    const message = `Forgot your password? Submit a PATCH request with your 
+    new password and passwordConirm to: ${resetURL}\nIf you didn't 
+    forget your password, pleae ignore this email!`;
+
+    //Pass info into the function to send token and message to users email
+    await sendEmail({
+      email: user.email,
+      subject:
+        'Your password reset token (valid for 10 min)',
+      message,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token sent to email!',
+    });
   }
 );
 
