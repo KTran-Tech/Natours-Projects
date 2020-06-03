@@ -2,6 +2,7 @@
 const { promisify } = require('util');
 //Like a passport used for verification that come built-in already
 const jwt = require('jsonwebtoken');
+//This serves as the database access point
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -178,3 +179,26 @@ exports.restrict = (...roles) => {
     next();
   };
 };
+
+exports.forgotPassword = catchAsync(
+  async (req, res, next) => {
+    // 1) Get user based on POSTed email
+    //"User" refers to the database
+    const user = await User.findOne({
+      email: req.body.email,
+    });
+    if (!user) {
+      return next(
+        new AppError(
+          'There is no user with email address.',
+          404
+        )
+      );
+    }
+    // 2) Generate the random reset token
+
+    // 3) Send it to
+  }
+);
+
+exports.resetPassword = (req, res, next) => {};
