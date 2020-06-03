@@ -91,7 +91,7 @@ exports.login = catchAsync(
   }
 );
 
-//get all tours
+//get all tours but checks if token is valid
 exports.protect = catchAsync(
   async (req, res, next) => {
     // 1) Get token and check if its there
@@ -162,9 +162,11 @@ exports.protect = catchAsync(
   }
 );
 
+//creates an array from the parameter, and RESTRICT access only to specific roles
 exports.restrict = (...roles) => {
+  //returns a middleware function that has access to the roles parameter
   return (req, res, next) => {
-    // roles ['admin', 'lead-guide']. role='user'
+    // roles ['admin', 'lead-guide'], if role="user" then you don't have permission
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError(
@@ -173,5 +175,6 @@ exports.restrict = (...roles) => {
         )
       );
     }
+    next();
   };
 };
