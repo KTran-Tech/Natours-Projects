@@ -1,3 +1,5 @@
+//this is to encrypt your unencrypted token
+const crypto = require('crypto');
 //util already comes built-in with node
 const { promisify } = require('util');
 //Like a passport used for verification that come built-in already
@@ -181,10 +183,11 @@ exports.restrict = (...roles) => {
   };
 };
 
+//when user forgets password and enters data into req.body to get it back
 exports.forgotPassword = catchAsync(
   async (req, res, next) => {
     // 1) Get users req.email and find one similar in database
-    //"User" refers to the database
+    //"User" references to the database
     const user = await User.findOne({
       email: req.body.email,
     });
@@ -214,8 +217,8 @@ exports.forgotPassword = catchAsync(
     )}/api/v1/users/resetPassword/${resetToken}`;
     //This is the message sent privately to users email containing the reset url
     const message = `Forgot your password? Submit a PATCH request with your 
-    new password and passwordConirm to: ${resetURL}\nIf you didn't 
-    forget your password, pleae ignore this email!`;
+    new password and passwordConfirm to: ${resetURL}\nIf you didn't 
+    forget your password, please ignore this email!`;
 
     try {
       //Pass info into the function to send token and message to users email
@@ -248,4 +251,24 @@ exports.forgotPassword = catchAsync(
   }
 );
 
-exports.resetPassword = (req, res, next) => {};
+//When the user gets the token from their email and enters it
+exports.resetPassword = catchAsync(
+  async (req, res, next) => {
+    // 1) Get user based on the token
+
+    //updates the parameters "email received unencrypted token" from the current route to be an encrypted
+    //'sha256' is the name of the algorithm
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+
+    //"User" references to the database
+    const user = await User.findOne({
+      passwordResetToken: hasedToken,
+    });
+    // 2) If token has not expired, user still exists in database, set the new password
+    // 3) Update changedPasswordAt property for the user
+    // 4) Log the user in, sends new JWT
+  }
+);

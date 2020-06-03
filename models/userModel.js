@@ -106,10 +106,15 @@ userSchema.methods.changedPasswordAfter = function (
 //Tells if you did a password reset with new token
 //You have to specify to the schema that you are building a method
 userSchema.methods.createPasswordResetToken = function () {
+  //the none encrypted
   const resetToken = crypto
     .randomBytes(32)
     .toString('hex');
+
+  /*the encrypted, this encrypt the original token (resetToken) so it could be used for the modified schema
+  and be sent to the database*/
   //change current property to this
+  //'sha256' is the name of the algorithm
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)
@@ -123,6 +128,7 @@ userSchema.methods.createPasswordResetToken = function () {
     this.passwordResetToken
   );
 
+  //returns the unencrypted database
   return resetToken;
 };
 
