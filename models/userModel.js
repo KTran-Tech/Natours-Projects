@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'A  must have a '],
+    required: [true, 'Please provide your email'],
     unique: true,
     lowercase: true,
     validate: [
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [
       true,
-      'A  must have a password Confirmation',
+      'Please confirm your password',
     ],
     validate: {
       //Will only work on Create() and Save()
@@ -52,8 +52,8 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
-  passwordResetExpires: Date,
   passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 //its a perfect time to manipulate data through middleware, when data is sent
@@ -121,7 +121,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .digest('hex');
   //change current property to this
   this.passwordResetExpires =
-    Date.now() + 10 + 60 + 1000;
+    Date.now() + 10 * 60 * 1000;
 
   console.log(
     { resetToken },

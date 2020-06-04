@@ -29,7 +29,7 @@ exports.signup = catchAsync(
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      passwordConfirm: req.body.password,
+      passwordConfirm: req.body.passwordConfirm,
       passwordChangedAt:
         req.body.passwordChangedAt,
       role: req.body.role,
@@ -51,7 +51,6 @@ exports.signup = catchAsync(
 exports.login = catchAsync(
   async (req, res, next) => {
     const { email, password } = req.body;
-
     //1) Check if email and password exist
     if (!email || !password) {
       //it is important to call a return so that the login function finishes right away
@@ -167,7 +166,7 @@ exports.protect = catchAsync(
 );
 
 //creates an array from the parameter, and RESTRICT access only to specific roles
-exports.restrict = (...roles) => {
+exports.restrictTo = (...roles) => {
   //returns a middleware function that has access to the roles parameter
   return (req, res, next) => {
     // roles ['admin', 'lead-guide'], if role="user" then you don't have permission
@@ -244,9 +243,9 @@ exports.forgotPassword = catchAsync(
 
       return next(
         new AppError(
-          'There was an error sending the email. Try again later!'
-        ),
-        500
+          'There was an error sending the email. Try again later!',
+          500
+        )
       );
     }
   }
@@ -257,8 +256,9 @@ exports.resetPassword = catchAsync(
   async (req, res, next) => {
     // 1) Get user based on the token
 
-    //updates the parameters "email received unencrypted token" from the current route to be an encrypted
+    //updates the parameters "email received unencrypted token" from the current route to be encrypted
     //'sha256' is the name of the algorithm
+    //Encrypted
     const hashedToken = crypto
       .createHash('sha256')
       .update(req.params.token)
@@ -266,10 +266,12 @@ exports.resetPassword = catchAsync(
 
     //"User" references the database
     //finds to see if the same encrypted token exists in the database
+    //Encrypted
     const user = await User.findOne({
       passwordResetToken: hashedToken,
       passwordResetExpires: { $gt: Date.now() },
     });
+
     // 2) If token has not expired and user still exists in the database, set the new password
 
     //if the data cease to be false, error message
@@ -290,6 +292,16 @@ exports.resetPassword = catchAsync(
     //The commands above only modifies the schema document data, you have to save it
     await user.save();
     // 3) Update changedPasswordAt property for the user
+
     // 4) Log the user in, sends new JWT
+
+    //If everything works, send token to client
+    const token = signToken(user._id);
+
+    //this is what you ONLY return back to user in JSON file
+    res.status(200).json({
+      status: 'success',
+      token,
+    });
   }
 );
