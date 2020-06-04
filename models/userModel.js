@@ -56,7 +56,15 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
 });
 
-//its a perfect time to manipulate data through middleware, when data is sent
+//
+
+//
+
+//
+
+//PRE-SAVE
+
+//its a perfect time to manipulate data through middleware, when data is sent before being entirely saved
 //invoke this function 'pre' before, 'save' saving the data to the database
 userSchema.pre('save', async function (next) {
   //if password has not been modified then call next middleware
@@ -71,6 +79,24 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
+
+//its a perfect time to manipulate data through middleware, when data is sent before being entirely saved
+//invoke this function 'pre' before, 'save' saving the data to the database
+userSchema.pre('save', function (next) {
+  //if password has not been changed or the document has just been created, then move on to the next middleware and ignore this one
+  if (!this.isModified('password' || this.isNew))
+    return next();
+
+  //sometimes the program lags behind a bit, so minus 1 second will help
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+//
+
+//
+
+//METHODS
 
 //these tools are built-in with mongoose so you could use anytime
 //You have to specify to the schema that you are building a method
