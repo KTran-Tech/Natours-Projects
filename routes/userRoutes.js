@@ -17,6 +17,12 @@ router.patch(
   authController.resetPassword
 );
 
+router.patch(
+  '/updateMyPassword',
+  authController.protect,
+  authController.updatePassword
+);
+
 router
   .route('/')
   .get(userController.getAllUsers)

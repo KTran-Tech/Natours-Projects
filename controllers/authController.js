@@ -93,7 +93,6 @@ exports.login = catchAsync(async (req, res, next) => {
 
   //3) If everything works, send token to client
   createSendToken(user, 200, res);
-
 });
 
 //get all tours but checks if token is valid
@@ -292,7 +291,7 @@ exports.resetPassword = catchAsync(
 
     //If everything works, send token to client
     createSendToken(user, 200, res);
-
+  }
 );
 
 //
@@ -327,6 +326,5 @@ exports.updatePassword = catchAsync(
     await user.save();
     // 4) Log user in, send JWT
     createSendToken(user, 200, res);
-
   }
 );
