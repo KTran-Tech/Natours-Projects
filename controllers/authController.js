@@ -10,89 +10,102 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 
+//
+
+//
+
+//Token Functions
+
 const signToken = (id) => {
-  return jwt.sign(
-    { id },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    }
-  );
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
 };
 
-exports.signup = catchAsync(
-  async (req, res, next) => {
-    //the create() will also add the data to the database
-    //pass in 'req.body' data to (User)schema and create new user
-    //this is a security improvement because it allows user to only enter these specific data
-    const newUser = await User.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      passwordConfirm: req.body.passwordConfirm,
-      passwordChangedAt:
-        req.body.passwordChangedAt,
-      role: req.body.role,
-    });
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
 
-    const token = signToken(newUser._id);
+  //this is what you ONLY return back to user in JSON file
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
 
-    //this is what you ONLY return back to user in JSON file
-    res.status(201).json({
-      status: 'success',
-      token,
-      data: {
-        user: newUser,
-      },
-    });
+//
+
+//
+
+//functions
+
+exports.signup = catchAsync(async (req, res, next) => {
+  //the create() will also add the data to the database
+  //pass in 'req.body' data to (User)schema and create new user
+  //this is a security improvement because it allows user to only enter these specific data
+  const newUser = await User.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm,
+    passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role,
+  });
+
+  const token = signToken(newUser._id);
+
+  //this is what you ONLY return back to user in JSON file
+  res.status(201).json({
+    status: 'success',
+    token,
+    data: {
+      user: newUser,
+    },
+  });
+});
+
+exports.login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+  //1) Check if email and password exist
+  if (!email || !password) {
+    //it is important to call a return so that the login function finishes right away
+    //call upon next middleware
+    return next(
+      new AppError(
+        'Please provide email and password!',
+        400
+      )
+    );
   }
-);
+  //2) Check if user exists && password is correct from database
+  const user = await User.findOne({
+    email,
+  }).select('+password');
 
-exports.login = catchAsync(
-  async (req, res, next) => {
-    const { email, password } = req.body;
-    //1) Check if email and password exist
-    if (!email || !password) {
-      //it is important to call a return so that the login function finishes right away
-      //call upon next middleware
-      return next(
-        new AppError(
-          'Please provide email and password!',
-          400
-        )
-      );
-    }
-    //2) Check if user exists && password is correct from database
-    const user = await User.findOne({
-      email,
-    }).select('+password');
-
-    if (
-      !user ||
-      !(await user.correctPassword(
-        password,
-        user.password
-      ))
-    ) {
-      //it is important to call a return so that the login function finishes right away
-      return next(
-        new AppError(
-          'Incorrect email or password',
-          401
-        )
-      );
-    }
-
-    //3) If everything works, send token to client
-    const token = signToken(user._id);
-
-    //this is what you ONLY return back to user in JSON file
-    res.status(200).json({
-      status: 'success',
-      token,
-    });
+  if (
+    !user ||
+    !(await user.correctPassword(
+      password,
+      user.password
+    ))
+  ) {
+    //it is important to call a return so that the login function finishes right away
+    return next(
+      new AppError('Incorrect email or password', 401)
+    );
   }
-);
+
+  //3) If everything works, send token to client
+  const token = signToken(user._id);
+
+  //this is what you ONLY return back to user in JSON file
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
+});
 
 //get all tours but checks if token is valid
 exports.protect = catchAsync(
@@ -101,14 +114,10 @@ exports.protect = catchAsync(
     let token;
     if (
       req.headers.authorization &&
-      req.headers.authorization.startsWith(
-        'Bearer'
-      )
+      req.headers.authorization.startsWith('Bearer')
     ) {
       // .split('') will will remove the space and create an array of the two
-      token = req.headers.authorization.split(
-        ' '
-      )[1];
+      token = req.headers.authorization.split(' ')[1];
     }
     //if the token doesnt not exist
     if (!token) {
@@ -147,9 +156,7 @@ exports.protect = catchAsync(
     // 4) Check if user changed password after the token was issued
     //iat stands for token 'ISSUED AT'
     if (
-      currentUser.changedPasswordAfter(
-        decoded.iat
-      )
+      currentUser.changedPasswordAfter(decoded.iat)
     ) {
       return next(
         new AppError(
@@ -285,8 +292,7 @@ exports.resetPassword = catchAsync(
     }
     //officially modify the old password to the new reset password and other properties
     user.password = req.body.password;
-    user.passwordConfirm =
-      req.body.passwordConfirm;
+    user.passwordConfirm = req.body.passwordConfirm;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     //The commands above only modifies the schema document data, you have to save it
@@ -312,9 +318,30 @@ exports.resetPassword = catchAsync(
 
 //
 
-exports.updatePassword = (req, res, next) => {
-  // 1) Get user from collection
-  // 2) Check if POSTed current password is correct
-  // 3) If so, update password
-  // 4) Log user in, send JWT
-};
+exports.updatePassword = catchAsync(
+  async (req, res, next) => {
+    // 1) Get user from collection
+    const user = await User.findById(
+      req.user.id
+    ).select('+password');
+    // 2) Check if POSTed current password is correct
+    if (
+      !(await user.correctPassword(
+        req.body.passwordCurrent,
+        user.password
+      ))
+    ) {
+      return next(
+        new AppError(
+          'Your current password is wrong',
+          401
+        )
+      );
+    }
+    // 3) If so, update password
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    await user.save();
+    // 4) Log user in, send JWT
+  }
+);
