@@ -22,6 +22,8 @@ const signToken = (id) => {
   });
 };
 
+//
+
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
@@ -50,20 +52,12 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    passwordChangedAt: req.body.passwordChangedAt,
-    role: req.body.role,
+    // //For security reasons don't include these
+    // passwordChangedAt: req.body.passwordChangedAt,
+    // role: req.body.role,
   });
 
-  const token = signToken(newUser._id);
-
-  //this is what you ONLY return back to user in JSON file
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -98,13 +92,8 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   //3) If everything works, send token to client
-  const token = signToken(user._id);
+  createSendToken(user, 200, res);
 
-  //this is what you ONLY return back to user in JSON file
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
 });
 
 //get all tours but checks if token is valid
@@ -302,14 +291,8 @@ exports.resetPassword = catchAsync(
     // 4) Log the user in, sends new JWT
 
     //If everything works, send token to client
-    const token = signToken(user._id);
+    createSendToken(user, 200, res);
 
-    //this is what you ONLY return back to user in JSON file
-    res.status(200).json({
-      status: 'success',
-      token,
-    });
-  }
 );
 
 //
@@ -343,5 +326,7 @@ exports.updatePassword = catchAsync(
     user.passwordConfirm = req.body.passwordConfirm;
     await user.save();
     // 4) Log user in, send JWT
+    createSendToken(user, 200, res);
+
   }
 );
