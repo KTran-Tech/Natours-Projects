@@ -6,8 +6,19 @@ const AppError = require('../utils/appError');
 
 //
 
-// Functions and Methods 
+// Functions and Methods
 
+//'...allowedFields' is an array containing all arguments passed
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  //If the users 'obj' req.body contain the required fields from the array 'allowedFields', then create new object that includes propertie name equal to field names
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el))
+      newObj[el] = obj[el];
+  });
+  //should return back an object with properties
+  return newObj;
+};
 
 //
 
@@ -40,7 +51,7 @@ exports.getAllUsers = catchAsync(
 
 exports.updateMe = catchAsync(
   async (req, res, next) => {
-    // 1) Create error if user POSTs password data
+    // 1) Sends Error if user passes in password in req.body
     if (
       req.body.password ||
       req.body.passwordConfirm
@@ -59,10 +70,12 @@ exports.updateMe = catchAsync(
       'name',
       'email'
     );
+    //find by id and update with the new filteredBody object
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       filteredBody,
       {
+        //setting it as a "new" document
         new: true,
         runValidators: true,
       }
@@ -73,6 +86,9 @@ exports.updateMe = catchAsync(
 
     res.status(200).json({
       status: 'success',
+      data: {
+        user: updatedUser,
+      },
     });
   }
 );
