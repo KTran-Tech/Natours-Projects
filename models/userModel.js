@@ -86,6 +86,14 @@ userSchema.pre('save', function (next) {
   next();
 });
 
+/*invoke this middleware before any 'find' commands like User.findByIdAndUpdate() is
+done to the database */
+userSchema.pre(/^find/, function (next) {
+  //Find only users that has "active" property set to true
+  this.find({ active: { $ne: false } });
+  next();
+});
+
 //
 
 //
