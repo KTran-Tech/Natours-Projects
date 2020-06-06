@@ -2,6 +2,9 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -23,6 +26,7 @@ if (process.env.NODE_ENV === 'development') {
   //e.g: GET /api/v1/tours 200 24.046 ms - 8747
   app.use(morgan('dev'));
 }
+
 //LIMIT REQUEST FROM SAME API
 //limit request from user for routing
 //only 100 request per hour, if too many send back error
@@ -32,13 +36,41 @@ const limiter = rateLimit({
   message:
     'Too many request from this IP, please try again in an hour!',
 });
-
 //use this tool when route starts with...
 app.use('/api', limiter);
+
+//
+
+//
+
+//
 
 // to be able to read the incoming (req object) as a JSON Object with a size limit of 10kb
 app.use(express.json({ limit: '10kb' }));
 app.use(express.static(`${__dirname}/public`));
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+// Data sanitization against XSS
+app.use(xss());
+
+// Prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+);
+
+//
+
+//
 
 //Just Testing Middleware, not important
 app.use((req, res, next) => {
@@ -47,16 +79,14 @@ app.use((req, res, next) => {
   next();
 });
 
+//
+
+//
+
 // #) ROUTES
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
-
-//
-
-//
-
-//
 
 //for all other routes, '*' means everything
 app.all('*', (req, res, next) => {
