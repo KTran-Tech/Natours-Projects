@@ -59,6 +59,9 @@ const createSendToken = (user, statusCode, res) => {
 
   //
 
+  //removes the password property from showing up to user(output)
+  user.password = undefined;
+
   //this is what you ONLY return back to user in JSON file
   res.status(statusCode).json({
     status: 'success',
