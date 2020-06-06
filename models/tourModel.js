@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 // A slug is a unique identifier for the resource of the url
 const slugify = require('slugify');
 // const validator = require('validator');
-
+const User = require('./userModel');
 //schema(outline/model)
 //specify a schema for our data
 const tourSchema = new mongoose.Schema(
@@ -133,6 +133,7 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
+    guides: Array,
   },
   //
   //
@@ -160,6 +161,17 @@ tourSchema.pre('save', function (next) {
 });
 //DOCUMENT MIDDLEWARE, 'post' means to happen after saving the document
 // tourSchema.post('save', function (doc, next) {});
+
+tourSchema.pre('save', async function (next) {
+  //For every item in schema 'this.guides' findById(element property name) in User(database)
+  const guidesPromises = this.guides.map(
+    async (element) => await User.findById(element)
+  );
+  //Promise.all() is useful anytime you have more than one promise
+  //If any of the passed promises are rejected, then this method rejects the value of that promise
+  this.guides = await Promise.all(guidesPromises);
+  next();
+});
 
 //
 
