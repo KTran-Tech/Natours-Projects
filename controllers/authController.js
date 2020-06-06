@@ -17,6 +17,7 @@ const sendEmail = require('../utils/email');
 //Token Functions
 
 const signToken = (id) => {
+  //signing a signature token, creates new token based on these mixes of arguments passed in
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -24,8 +25,39 @@ const signToken = (id) => {
 
 //
 
+//
+
+//The response sent back to the user with data
 const createSendToken = (user, statusCode, res) => {
+  //creates new token to send it back to user to use
   const token = signToken(user._id);
+
+  //
+
+  //
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() +
+        process.env.JWT_COOKIE_EXPIRES_IN *
+          24 *
+          60 *
+          60 *
+          1000
+    ),
+    //makes it so cookie cannot be modified by browser
+    httpOnly: true,
+  };
+  //this means cookie will only be sent on an encrypted connection (https)
+  if (process.env.NODE_ENV === 'production')
+    cookieOptions.secure = true;
+  //attaching cookie to response object
+  //making token more secure by storing it in cookie for user
+  // 'jwt' is the name you choose for the cookie
+  res.cookie('jwt', token, cookieOptions);
+
+  //
+
+  //
 
   //this is what you ONLY return back to user in JSON file
   res.status(statusCode).json({
