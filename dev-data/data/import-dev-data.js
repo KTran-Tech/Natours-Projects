@@ -21,19 +21,14 @@ mongoose
     useFindAndModify: false,
     useUnifiedTopology: true,
   })
-  .then(() =>
-    console.log('DB connection successful')
-  );
+  .then(() => console.log('DB connection successful'));
 
 //
 
 // To READ JSON FILE
-
+//Also allows database to copy the data from file and use it as its own
 const tours = JSON.parse(
-  fs.readFileSync(
-    `${__dirname}/tours-simple.json`,
-    'utf-8'
-  )
+  fs.readFileSync(`${__dirname}/tours.json`, 'utf-8')
 );
 
 // To IMPORT DATA INTO DATABASE
@@ -58,6 +53,10 @@ const deleteData = async () => {
   process.exit();
 };
 
+//To manipulate Database
+//First you have to '--delete' your current data in database and then '--import' in your newer data
+//ex: node ./dev-data/data/import-dev-data.js --delete
+//ex: node ./dev-data/data/import-dev-data.js --import
 if (process.argv[2] === '--import') {
   importData();
 } else if (process.argv[2] === '--delete') {

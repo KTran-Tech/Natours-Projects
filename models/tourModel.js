@@ -29,10 +29,7 @@ const tourSchema = new mongoose.Schema(
     slug: String,
     duration: {
       type: Number,
-      required: [
-        true,
-        'A tour must have a duration',
-      ],
+      required: [true, 'A tour must have a duration'],
     },
     maxGroupSize: {
       type: Number,
@@ -43,11 +40,8 @@ const tourSchema = new mongoose.Schema(
     },
     difficulty: {
       type: String,
-      required: [
-        true,
-        'A tour must have difficulty',
-      ],
-      //this is only for string
+      required: [true, 'A tour must have difficulty'],
+      //Give you the options of only these required field
       enum: {
         values: ['easy', 'medium', 'difficult'],
         message:
@@ -112,7 +106,36 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    //
+    //
+    startLocation: {
+      //GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        //Give you the options of only these required field
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
   },
+  //
+  //
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -121,12 +144,10 @@ const tourSchema = new mongoose.Schema(
 
 //this is adding on a virtual type with extra data to the tourSchema
 //Here we can do the calculation right in the model itself
-tourSchema
-  .virtual('durationWeeks')
-  .get(function () {
-    //if you wnat to use the "this" keyword then always use the normal function
-    return this.duration / 7;
-  });
+tourSchema.virtual('durationWeeks').get(function () {
+  //if you wnat to use the "this" keyword then always use the normal function
+  return this.duration / 7;
+});
 
 //DOCUMENT MIDDLEWARE, 'pre' means to happen before saving the document
 //'this' selects the current document, e.g a new document submitted to the database by user(.create() and .save() only)
