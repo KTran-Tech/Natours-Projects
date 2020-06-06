@@ -22,12 +22,7 @@ const userSchema = new mongoose.Schema({
   photo: String,
   role: {
     type: String,
-    enum: [
-      'user',
-      'guide',
-      'lead-guide',
-      'admin',
-    ],
+    enum: ['user', 'guide', 'lead-guide', 'admin'],
     default: 'user',
   },
   password: {
@@ -38,10 +33,7 @@ const userSchema = new mongoose.Schema({
   },
   passwordConfirm: {
     type: String,
-    required: [
-      true,
-      'Please confirm your password',
-    ],
+    required: [true, 'Please confirm your password'],
     validate: {
       //Will only work on Create() and Save()
       //pass the property for this object and check if...
@@ -70,10 +62,7 @@ userSchema.pre('save', async function (next) {
   //if password has not been modified then call next middleware
   if (!this.isModified('password')) return next();
   //encrypt password with cost of 12
-  this.password = await bcrypt.hash(
-    this.password,
-    12
-  );
+  this.password = await bcrypt.hash(this.password, 12);
   //delete password field
   //this works because the password is only a required INPUT not required data to be pushed to database
   this.passwordConfirm = undefined;
@@ -84,7 +73,7 @@ userSchema.pre('save', async function (next) {
 //invoke this function 'pre' before, 'save' saving the data to the database
 userSchema.pre('save', function (next) {
   //if password has not been changed or the document has just been created, then move on to the next middleware and ignore this one
-  if (!this.isModified('password' || this.isNew))
+  if (!this.isModified('password') || this.isNew)
     return next();
 
   //sometimes the program lags behind a bit, so minus 1 second will help
@@ -149,10 +138,7 @@ userSchema.methods.createPasswordResetToken = function () {
   this.passwordResetExpires =
     Date.now() + 10 * 60 * 1000;
 
-  console.log(
-    { resetToken },
-    this.passwordResetToken
-  );
+  console.log({ resetToken }, this.passwordResetToken);
 
   //returns the unencrypted database
   return resetToken;

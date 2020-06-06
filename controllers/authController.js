@@ -46,7 +46,7 @@ const createSendToken = (user, statusCode, res) => {
 exports.signup = catchAsync(async (req, res, next) => {
   //the create() will also add the data to the database
   //pass in 'req.body' data to (User)schema and create new user
-  //this is a security improvement because it allows user to only enter these specific data
+  //this is a security improvement, it allows user to ONLY enter these specific data
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -56,7 +56,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     // passwordChangedAt: req.body.passwordChangedAt,
     // role: req.body.role,
   });
-
+  console.log(newUser);
   createSendToken(newUser, 201, res);
 });
 
