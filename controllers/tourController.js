@@ -75,9 +75,10 @@ exports.getAllTour = catchAsync(
 
 //
 
+//You can think of populate() like the spread operation ...object spreading out the data from that ID referred name
 exports.getTour = catchAsync(
   async (req, res, next) => {
-    const tour = await Tour.findById(
+    const tour = await await Tour.findById(
       req.params.id
     );
 
@@ -88,10 +89,7 @@ exports.getTour = catchAsync(
       would still be an ID but an invalid nonexistent ID throwing the error below */
       //return so that we dont output two responses and exit
       return next(
-        new AppError(
-          'No tour found with that ID',
-          404
-        )
+        new AppError('No tour found with that ID', 404)
       );
     }
 
@@ -140,10 +138,7 @@ exports.updateTour = catchAsync(
       would still be an ID but an invalid nonexistent ID throwing the error below */
       //return so that we dont output two responses and exit
       return next(
-        new AppError(
-          'No tour found with that ID',
-          404
-        )
+        new AppError('No tour found with that ID', 404)
       );
     }
 
@@ -169,10 +164,7 @@ exports.deleteTour = catchAsync(
       would still be an ID but an invalid nonexistent ID throwing the error below */
       //return so that we dont output two responses and exit
       return next(
-        new AppError(
-          'No tour found with that ID',
-          404
-        )
+        new AppError('No tour found with that ID', 404)
       );
     }
 

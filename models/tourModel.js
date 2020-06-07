@@ -168,6 +168,17 @@ tourSchema.pre('save', function (next) {
 //DOCUMENT MIDDLEWARE, 'post' means to happen after saving the document
 // tourSchema.post('save', function (doc, next) {});
 
+//Before ANY 'find' query is invoke, eg.Tour.findById(), do this 
+tourSchema.pre(/^find/, function (next) {
+
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  })
+
+  next();
+});
+
 //
 
 //----------------------------//
