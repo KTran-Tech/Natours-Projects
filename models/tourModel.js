@@ -171,6 +171,7 @@ tourSchema.pre('save', function (next) {
 
 //Before ANY 'find' query is invoke, eg.Tour.findById(), do this
 tourSchema.pre(/^find/, function (next) {
+  //'guides' property of Schema
   this.populate({
     path: 'guides',
     select: '-__v -passwordChangedAt',
