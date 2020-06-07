@@ -137,12 +137,13 @@ const tourSchema = new mongoose.Schema(
     guides: [
       {
         type: mongoose.Schema.ObjectId,
+        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);""
         ref: 'User',
       },
     ],
   },
   //
-  //
+  //Virtuals have additional attribute but it does not get inserted into DB. So this will make it visible to us in the output
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -168,13 +169,12 @@ tourSchema.pre('save', function (next) {
 //DOCUMENT MIDDLEWARE, 'post' means to happen after saving the document
 // tourSchema.post('save', function (doc, next) {});
 
-//Before ANY 'find' query is invoke, eg.Tour.findById(), do this 
+//Before ANY 'find' query is invoke, eg.Tour.findById(), do this
 tourSchema.pre(/^find/, function (next) {
-
   this.populate({
     path: 'guides',
     select: '-__v -passwordChangedAt',
-  })
+  });
 
   next();
 });
