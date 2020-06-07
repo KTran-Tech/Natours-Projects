@@ -1,6 +1,9 @@
 const User = require('../models/userModel');
+//To catch reject errors from async functions
 const catchAsync = require('../utils/catchAsync');
+//To output user friendly error
 const AppError = require('../utils/appError');
+
 
 //
 

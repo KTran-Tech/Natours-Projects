@@ -10,7 +10,7 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
-
+const reviewRouter = require('./routes/reviewRoutes');
 // to be able to use express methods
 //app.use() is a command to tell express to use these specific tools
 const app = express();
@@ -84,10 +84,10 @@ app.use((req, res, next) => {
 //
 
 // #) ROUTES
-
+//To make this route in the web work
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
-
+app.use('/api/v1/reviews', reviewRouter);
 //for all other routes, '*' means everything
 app.all('*', (req, res, next) => {
   //if you pass in something it will automatically know its an error

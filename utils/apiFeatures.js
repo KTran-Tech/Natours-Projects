@@ -35,9 +35,7 @@ class APIFeatures {
     //find '$lt': '1500' and use that to filter,
     //query could then be chained with other logic(add onto the change we did)
     // const query = Tour.find(JSON.parse(queryStr));
-    this.query = this.query.find(
-      JSON.parse(queryStr)
-    );
+    this.query = this.query.find(JSON.parse(queryStr));
 
     //"this" is the entire object
     return this;
@@ -86,14 +84,11 @@ class APIFeatures {
     //a nice way to turn string into a number
     //if there is no page info then default to 1 or 100
     const page = this.queryString.page * 1 || 1;
-    const limit =
-      this.queryString.limit * 1 || 100;
+    const limit = this.queryString.limit * 1 || 100;
     //formula for page skipping, no need to memorize
     const skip = (page - 1) * limit;
     //'limit' is the amount of results you want
-    this.query = this.query
-      .skip(skip)
-      .limit(limit);
+    this.query = this.query.skip(skip).limit(limit);
 
     //"this" is the entire object
     return this;
