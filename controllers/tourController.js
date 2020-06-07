@@ -78,9 +78,9 @@ exports.getAllTour = catchAsync(
 //You can think of populate() like the spread operation ...object spreading out the data from that ID referred name
 exports.getTour = catchAsync(
   async (req, res, next) => {
-    const tour = await await Tour.findById(
+    const tour = await Tour.findById(
       req.params.id
-    );
+    ).populate('reviews');
 
     if (!tour) {
       /* Params ID have a strict length that you cannot violate, e.g adding an additonal character (causing it to

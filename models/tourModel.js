@@ -137,7 +137,7 @@ const tourSchema = new mongoose.Schema(
     guides: [
       {
         type: mongoose.Schema.ObjectId,
-        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);""
+        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
         ref: 'User',
       },
     ],
@@ -150,12 +150,33 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
-//this is adding on a virtual type with extra data to the tourSchema
+//
+
+//
+
+//VIRTUALS
+
+//this is adding on a virtual type with extra data to the tourSchema, virtual types don't get added to the database
 //Here we can do the calculation right in the model itself
 tourSchema.virtual('durationWeeks').get(function () {
   //if you wnat to use the "this" keyword then always use the normal function
   return this.duration / 7;
 });
+
+// Virtual populate
+//kind of like an embedded dataset in Schema to be populated but doesnt get entered into database
+tourSchema.virtual('reviews', {
+  //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
+  ref: 'Review',
+  //This is the property of the "Review" Schema Model Populate Field
+  foreignField: 'tour',
+  //with its own Id
+  localField: '_id',
+});
+
+//
+
+//
 
 //DOCUMENT MIDDLEWARE, 'pre' means to happen before saving the document
 //'this' selects the current document, e.g a new document submitted to the database by user(.create() and .save() only)

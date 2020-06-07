@@ -11,15 +11,11 @@ const reviewSchema = mongoose.Schema(
       min: [1, 'Ratings must be above 1.0'],
       max: [5, 'Ratings must be below 5.0'],
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
     //Tells you what tour the review belongs to
     tour: [
       {
         type: mongoose.Schema.ObjectId,
-        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);""
+        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
         ref: 'Tour',
         required: [
           true,
@@ -31,7 +27,7 @@ const reviewSchema = mongoose.Schema(
     user: [
       {
         type: mongoose.Schema.ObjectId,
-        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);""
+        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
         ref: 'User',
         required: [
           true,
@@ -39,6 +35,10 @@ const reviewSchema = mongoose.Schema(
         ],
       },
     ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   //Virtuals have additional attribute but it does not get inserted into DB. So this will make it visible to us in the output
   {
@@ -50,15 +50,25 @@ const reviewSchema = mongoose.Schema(
 //PRE
 
 reviewSchema.pre(/^find/, function (next) {
+  // this.populate({
+  //   path: 'tour',
+  //   select: 'name',
+  // }).populate({
+  //   path: 'user',
+  //   select: 'name photo',
+  // });
+
   this.populate({
-    path: 'tour',
-    select: 'name',
-  }).populate({
     path: 'user',
     select: 'name photo',
   });
+
   next();
 });
+
+//
+
+//
 
 const Review = mongoose.model('Review', reviewSchema);
 
