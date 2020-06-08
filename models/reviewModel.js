@@ -12,29 +12,22 @@ const reviewSchema = mongoose.Schema(
       max: [5, 'Ratings must be below 5.0'],
     },
     //Tells you what tour the review belongs to
-    tour: [
-      {
-        type: mongoose.Schema.ObjectId,
-        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
-        ref: 'Tour',
-        required: [
-          true,
-          'Review must belong to a tour.',
-        ],
-      },
-    ],
+    tour: {
+      type: mongoose.Schema.ObjectId,
+      //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
+      ref: 'Tour',
+      required: [
+        true,
+        'Review must belong to a tour.',
+      ],
+    },
     //Tells you which user left the review
-    user: [
-      {
-        type: mongoose.Schema.ObjectId,
-        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
-        ref: 'User',
-        required: [
-          true,
-          'Review must belong to a user',
-        ],
-      },
-    ],
+    user: {
+      type: mongoose.Schema.ObjectId,
+      //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
+      ref: 'User',
+      required: [true, 'Review must belong to a user'],
+    },
     createdAt: {
       type: Date,
       default: Date.now,

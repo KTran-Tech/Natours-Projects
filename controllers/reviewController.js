@@ -2,19 +2,6 @@ const Review = require('../models/reviewModel.js');
 //To catch reject errors from async functions
 const catchAsync = require('../utils/catchAsync');
 
-exports.createReview = catchAsync(
-  async (req, res, next) => {
-    const newReview = await Review.create(req.body);
-
-    res.status(201).json({
-      status: 'success',
-      data: {
-        review: newReview,
-      },
-    });
-  }
-);
-
 exports.getAllReviews = catchAsync(
   async (req, res, next) => {
     const reviews = await Review.find();
@@ -24,6 +11,23 @@ exports.getAllReviews = catchAsync(
       results: reviews.length,
       data: {
         reviews,
+      },
+    });
+  }
+);
+
+exports.createReview = catchAsync(
+  async (req, res, next) => {
+    if (!req.body.tour)
+      req.body.tour = req.params.tourId;
+    if (!req.body.user) req.body.user = req.user.id;
+
+    const newReview = await Review.create(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        review: newReview,
       },
     });
   }
