@@ -5,6 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 //404 error handler, ect.
 const AppError = require('../utils/appError');
 //
+const factory = require('./handlerFactory');
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -151,29 +152,26 @@ exports.updateTour = catchAsync(
   }
 );
 
-exports.deleteTour = catchAsync(
-  async (req, res, next) => {
-    const tour = await Tour.findByIdAndDelete(
-      req.params.id
-    );
+exports.deleteTour = factory.deleteOne(Tour);
 
-    if (!tour) {
-      /* Params ID have a strict length that you cannot violate, e.g adding an additonal character (causing it to
-      no longer be considered an ID), or else it would throw an error, 
-      but if you were to change one of its character to something else then that ID
-      would still be an ID but an invalid nonexistent ID throwing the error below */
-      //return so that we dont output two responses and exit
-      return next(
-        new AppError('No tour found with that ID', 404)
-      );
-    }
+// exports.deleteTour = catchAsync(
+//   async (req, res, next) => {
+//     const tour = await Tour.findByIdAndDelete(
+//       req.params.id
+//     );
 
-    res.status(204).json({
-      status: 'success',
-      data: null,
-    });
-  }
-);
+//     if (!tour) {
+//       return next(
+//         new AppError('No tour found with that ID', 404)
+//       );
+//     }
+
+//     res.status(204).json({
+//       status: 'success',
+//       data: null,
+//     });
+//   }
+// );
 
 //
 

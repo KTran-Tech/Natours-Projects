@@ -4,7 +4,7 @@ const authController = require('../controllers/authController');
 
 const router = express.Router({ mergeParams: true });
 
-//Anyone can GET all reviews and read, + but only users can POST reviews
+//Anyone can GET all reviews and read, + but only USERS can POST reviews
 router
   .route('/')
   .get(reviewController.getAllReviews)
