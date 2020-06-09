@@ -154,6 +154,17 @@ const tourSchema = new mongoose.Schema(
 
 //
 
+//
+
+//
+
+//Compund Index: Making search reading more efficient to reduce reading time
+// tourSchema.index({ price: 1 });
+// tourSchema.index({ price: 1, ratingsAverage: -1 });
+// tourSchema.index({ slug: 1 });
+
+//
+
 //VIRTUALS
 
 //this is adding on a virtual type with extra data to the tourSchema, virtual types don't get added to the database

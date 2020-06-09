@@ -151,8 +151,8 @@ exports.getAll = (Model) =>
       .paginate();
 
     //
-
-    const doc = await features.query;
+    //.explain() just gives you the stats of the query
+    const doc = await features.query
 
     // console.log(req.query);
     // console.log(req.query, queryObj);

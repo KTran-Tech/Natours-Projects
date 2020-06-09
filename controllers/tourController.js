@@ -69,6 +69,7 @@ exports.getTourStats = catchAsync(
         //SORT BY GROUP like price, difficulty, ect
         $group: {
           //aggregate all data to each one only with exact difficulty level or ratingsAverage
+          //uppercase it also
           _id: { $toUpper: '$difficulty' },
           // _id: '$ratingsAverage',
           numTours: { $sum: 1 },

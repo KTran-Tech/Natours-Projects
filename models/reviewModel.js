@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 const reviewSchema = mongoose.Schema(
   {
@@ -13,6 +14,7 @@ const reviewSchema = mongoose.Schema(
     },
     //Tells you what tour the review belongs to
     tour: {
+      //special referencing command
       type: mongoose.Schema.ObjectId,
       //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
       ref: 'Tour',
@@ -57,6 +59,44 @@ reviewSchema.pre(/^find/, function (next) {
   });
 
   next();
+});
+
+//
+
+//
+
+//pass in specific tour Id given by user
+reviewSchema.statics.calcAverageRatings = async function (
+  tourId
+) {
+  //storing the calculation in "stats"
+  const stats = await this.aggregate([
+    {
+      //not suppose to show in console.log
+      //search and match that specific tour Id
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        //_id = "tour Id passed in by user"
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        //find the average rating of that tour
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+  console.log(stats);
+
+  await Tour.findByIdAndUpdate(tourId, {
+    ratingsQuantity: stats[0].nRating,
+    ratingsAverage: stats[0].avgRating,
+  });
+};
+
+reviewSchema.post('save', function () {
+  // this points to current review
+  this.constructor.calcAverageRatings(this.tour);
 });
 
 //
