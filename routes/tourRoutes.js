@@ -23,21 +23,34 @@ router
 
 router
   .route('/monthly-plan/:year')
-  .get(tourController.getMonthlyPlan);
+  .get(
+    authController.protect,
+    authController.restrictTo(
+      'admin',
+      'lead-guide',
+      'guide'
+    ),
+    tourController.getMonthlyPlan
+  );
 
 //if there is a request to post(create) data to url, then respond with...
 router
   .route('/')
-  .get(
+  .get(tourController.getAllTours)
+  .post(
     authController.protect,
-    tourController.getAllTours
-  )
-  .post(tourController.createTour);
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.createTour
+  );
 //if there is a request to get(read) data of url, then respond with...
 router
   .route('/:id')
   .get(tourController.getTour)
-  .patch(tourController.updateTour)
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.updateTour
+  )
   .delete(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),

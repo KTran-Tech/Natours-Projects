@@ -17,30 +17,28 @@ router.patch(
   authController.resetPassword
 );
 
+//
+
+//ANYTHING that comes AFTER this point will have this middleware applied
+router.use(authController.protect);
+//ANYTHING that comes AFTER this point will have this middleware applied
+
+//
+
 router.patch(
   '/updateMyPassword',
-  authController.protect,
   authController.updatePassword
 );
 
 router.get(
   '/me',
-  authController.protect,
   userController.getMe,
   userController.getUser
 );
 
-router.patch(
-  '/updateMe',
-  authController.protect,
-  userController.updateMe
-);
+router.patch('/updateMe', userController.updateMe);
 
-router.delete(
-  '/deleteMe',
-  authController.protect,
-  userController.deleteMe
-);
+router.delete('/deleteMe', userController.deleteMe);
 
 //
 
