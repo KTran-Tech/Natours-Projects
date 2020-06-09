@@ -105,53 +105,8 @@ exports.getTour = catchAsync(
   }
 );
 
-exports.createTour = catchAsync(
-  async (req, res, next) => {
-    //create a new request body object data that usually comes with POST
-    const newTour = await Tour.create(req.body);
-
-    res.status(201).json({
-      status: 'success',
-      data: {
-        tour: newTour,
-      },
-    });
-  }
-);
-
-exports.updateTour = catchAsync(
-  async (req, res, next) => {
-    //"new: true" its to allow you to return updated document
-
-    const tour = await Tour.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    if (!tour) {
-      /* Params ID have a strict length that you cannot violate, e.g adding an additonal character (causing it to
-      no longer be considered an ID), or else it would throw an error, 
-      but if you were to change one of its character to something else then that ID
-      would still be an ID but an invalid nonexistent ID throwing the error below */
-      //return so that we dont output two responses and exit
-      return next(
-        new AppError('No tour found with that ID', 404)
-      );
-    }
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tour,
-      },
-    });
-  }
-);
-
+exports.createTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
 exports.deleteTour = factory.deleteOne(Tour);
 
 // exports.deleteTour = catchAsync(

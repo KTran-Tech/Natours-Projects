@@ -1,6 +1,7 @@
 const Review = require('../models/reviewModel.js');
 //To catch reject errors from async functions
 const catchAsync = require('../utils/catchAsync');
+const factory = require('./handlerFactory');
 
 exports.getAllReviews = catchAsync(
   async (req, res, next) => {
@@ -21,25 +22,22 @@ exports.getAllReviews = catchAsync(
   }
 );
 
-exports.createReview = catchAsync(
-  async (req, res, next) => {
-    /*IF req.body.tour+user reference does not exist, e.g:
+//
+
+exports.setTourUserIds = (req, res, next) => {
+  /*IF req.body.tour+user reference does not exist, e.g:
     {
       tour: ID
       user: ID
     }
     then collect the info from the param*/
-    if (!req.body.tour)
-      req.body.tour = req.params.tourId;
-    if (!req.body.user) req.body.user = req.user.id;
-    //
-    const newReview = await Review.create(req.body);
+  if (!req.body.tour)
+    req.body.tour = req.params.tourId;
+  if (!req.body.user) req.body.user = req.user.id;
 
-    res.status(201).json({
-      status: 'success',
-      data: {
-        review: newReview,
-      },
-    });
-  }
-);
+  next();
+};
+
+exports.createReview = factory.createOne(Review);
+exports.updateReview = factory.updateOne(Review);
+exports.deleteReview = factory.deleteOne(Review);
