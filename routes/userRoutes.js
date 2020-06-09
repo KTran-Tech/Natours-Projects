@@ -42,7 +42,12 @@ router.delete('/deleteMe', userController.deleteMe);
 
 //
 
+//ANYTHING that comes AFTER this point will have this middleware applied
+router.use(authController.restrictTo('admin'));
+//ANYTHING that comes AFTER this point will have this middleware applied
+
 //
+
 router
   .route('/')
   .get(userController.getAllUsers)
