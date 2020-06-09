@@ -30,27 +30,17 @@ const filterObj = (obj, ...allowedFields) => {
 //
 
 // #) ROUTER HANDLERS
-exports.getAllUsers = catchAsync(
-  async (req, res, next) => {
-    //Collect all user from database
-    const users = await User.find();
-
-    // Send Response
-    res.status(200).json({
-      status: 'success',
-      results: users.length,
-      data: {
-        users,
-      },
-    });
-  }
-);
 
 //
 
 //
 
 // Update User Data
+
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 
 exports.updateMe = catchAsync(
   async (req, res, next) => {
@@ -116,8 +106,6 @@ exports.deleteMe = catchAsync(
   }
 );
 
-exports.getUser = factory.getOne(User);
-
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
@@ -126,6 +114,8 @@ exports.createUser = (req, res) => {
   });
 };
 
+exports.getUser = factory.getOne(User);
+exports.getAllUsers = factory.getAll(User);
 //Do NOT update passwords with this!
 exports.updateUser = factory.updateOne(User);
 exports.deleteUser = factory.deleteOne(User);
