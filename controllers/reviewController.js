@@ -24,6 +24,7 @@ exports.getAllReviews = catchAsync(
 
 //
 
+//EXTRA: Middleware to connect to createReview()
 exports.setTourUserIds = (req, res, next) => {
   /*IF req.body.tour+user reference does not exist, e.g:
     {
@@ -38,6 +39,7 @@ exports.setTourUserIds = (req, res, next) => {
   next();
 };
 
+exports.getReview = factory.getOne(Review);
 exports.createReview = factory.createOne(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);

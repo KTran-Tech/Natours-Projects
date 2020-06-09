@@ -1,9 +1,6 @@
 // const fs = require('fs');
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-//404 error handler, ect.
-const AppError = require('../utils/appError');
 //
 const factory = require('./handlerFactory');
 
@@ -26,85 +23,10 @@ exports.aliasTopTours = (req, res, next) => {
 
 //
 
-exports.getAllTour = catchAsync(
-  async (req, res, next) => {
-    //EXECUTE QUERY
-
-    //Literally passing in the method .Find() to constructor
-    const features = new APIFeatures(
-      Tour.find(),
-      req.query
-    ) //the reason for why chaining work is because all of the methods returns "this"
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-
-    //
-
-    const tours = await features.query;
-
-    // console.log(req.query);
-    // console.log(req.query, queryObj);
-
-    // const query = await Tour.find()
-    //   .where('duration')
-    //   .equals(5)
-    //   .where('difficulty')
-    //   .equals('easy');
-    /*send back the response as a json object(specially for 'status')
-        because 'tours' is already one */
-    res.status(200).json({
-      status: 'success',
-      results: tours.length,
-      data: {
-        tours,
-      },
-    });
-  }
-);
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//You can think of populate() like the spread operation ...object spreading out the data from that ID referred name
-exports.getTour = catchAsync(
-  async (req, res, next) => {
-    const tour = await Tour.findById(
-      req.params.id
-    ).populate('reviews');
-
-    if (!tour) {
-      /* Params ID have a strict length that you cannot violate, e.g adding an additonal character (causing it to
-      no longer be considered an ID), or else it would throw an error, 
-      but if you were to change one of its character to something else then that ID
-      would still be an ID but an invalid nonexistent ID throwing the error below */
-      //return so that we dont output two responses and exit
-      return next(
-        new AppError('No tour found with that ID', 404)
-      );
-    }
-
-    /*send back the response as a json object(specially for 'status')
-        because 'tours' is already one */
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tour,
-      },
-    });
-  }
-);
-
+exports.getAllTour = factory.getAll(Tour);
+exports.getTour = factory.getOne(Tour, {
+  path: 'reviews',
+});
 exports.createTour = factory.createOne(Tour);
 exports.updateTour = factory.updateOne(Tour);
 exports.deleteTour = factory.deleteOne(Tour);
