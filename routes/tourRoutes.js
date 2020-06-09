@@ -14,7 +14,7 @@ router
   .route('/top-5-cheap')
   .get(
     tourController.aliasTopTours,
-    tourController.getAllTour
+    tourController.getAllTours
   );
 
 router
@@ -30,7 +30,7 @@ router
   .route('/')
   .get(
     authController.protect,
-    tourController.getAllTour
+    tourController.getAllTours
   )
   .post(tourController.createTour);
 //if there is a request to get(read) data of url, then respond with...

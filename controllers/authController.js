@@ -6,6 +6,7 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 //This serves as the database access point
 const User = require('../models/userModel');
+//To catch reject errors from async functions
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');

@@ -1,5 +1,6 @@
 // const fs = require('fs');
 const Tour = require('../models/tourModel');
+//To catch reject errors from async functions
 const catchAsync = require('../utils/catchAsync');
 //
 const factory = require('./handlerFactory');
@@ -23,7 +24,7 @@ exports.aliasTopTours = (req, res, next) => {
 
 //
 
-exports.getAllTour = factory.getAll(Tour);
+exports.getAllTours = factory.getAll(Tour);
 exports.getTour = factory.getOne(Tour, {
   path: 'reviews',
 });

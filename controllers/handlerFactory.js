@@ -130,9 +130,19 @@ exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
     //EXECUTE QUERY
 
+    //
+
+    //To allow for nested GET reviews on tour
+    let filter = {};
+
+    if (req.params.tourId)
+      filter = { tour: req.params.tourId };
+
+    //
+
     //Literally passing in the method .Find() to constructor
     const features = new APIFeatures(
-      Model.find(),
+      Model.find(filter),
       req.query
     ) //the reason for why chaining work is because all of the methods returns "this"
       .filter()
