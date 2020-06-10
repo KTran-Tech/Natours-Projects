@@ -42,6 +42,17 @@ const reviewSchema = mongoose.Schema(
   }
 );
 
+//
+
+//Indexing to prevent duplicate Reviews
+//User can only submit 1 review and it is unique meaning it can not be duplicate
+reviewSchema.index(
+  { tour: 1, user: 1 },
+  { unique: true }
+);
+
+//
+
 //PRE
 
 reviewSchema.pre(/^find/, function (next) {
@@ -122,7 +133,7 @@ reviewSchema.pre(/^findOneAnd/, async function (next) {
 reviewSchema.post(/^findOneAnd/, async function (
   next
 ) {
-  //calculate ratings of the document tour review and update its average 
+  //calculate ratings of the document tour review and update its average
   await this.r.constructor.calcAverageRatings(
     this.r.tour
   );
