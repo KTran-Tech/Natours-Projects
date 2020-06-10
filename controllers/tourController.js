@@ -2,6 +2,8 @@
 const Tour = require('../models/tourModel');
 //To catch reject errors from async functions
 const catchAsync = require('../utils/catchAsync');
+//404 error handler, ect.
+const AppError = require('../utils/appError');
 //
 const factory = require('./handlerFactory');
 
@@ -168,3 +170,20 @@ exports.getMonthlyPlan = catchAsync(
     //
   }
 );
+
+// '/tours-within/distance/center/:latlng/unit/:unit',
+exports.getToursWithin = (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  //Original lat & Lng 45.34345345, 23.34234234
+  const { lat, lng } = latlng.split(',');
+
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat,lng.',
+        400
+      )
+    );
+  }
+  //
+};

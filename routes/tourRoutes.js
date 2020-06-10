@@ -33,6 +33,15 @@ router
     tourController.getMonthlyPlan
   );
 
+//
+
+router.route(
+  '/tours-within/distance/center/:latlng/unit/:unit',
+  tourController.getToursWithin
+);
+
+//
+
 //if there is a request to post(create) data to url, then respond with...
 router
   .route('/')
