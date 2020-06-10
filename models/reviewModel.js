@@ -65,7 +65,7 @@ reviewSchema.pre(/^find/, function (next) {
 
 //
 
-//pass in specific tour Id given by user
+//pass in specific tour Id given by user, this function will be called (below).
 reviewSchema.statics.calcAverageRatings = async function (
   tourId
 ) {
@@ -86,17 +86,46 @@ reviewSchema.statics.calcAverageRatings = async function (
       },
     },
   ]);
-  console.log(stats);
 
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsQuantity: stats[0].nRating,
-    ratingsAverage: stats[0].avgRating,
-  });
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5,
+    });
+  }
 };
-
+//After new review has been created, pass in tour Id data from the review
 reviewSchema.post('save', function () {
   // this points to current review
   this.constructor.calcAverageRatings(this.tour);
+});
+
+//
+
+//
+
+//This is basically the same as:
+//findByIdAndUpdate
+//findByIdAndDelete
+/* Before findOneAndUpdate()/Delete() reviews in database do... */
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  //This gets the current document/Schema passed in
+  this.r = await this.findOne();
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function (
+  next
+) {
+  //calculate ratings of the document tour review and update its average 
+  await this.r.constructor.calcAverageRatings(
+    this.r.tour
+  );
 });
 
 //
