@@ -33,15 +33,19 @@ router
     tourController.getMonthlyPlan
   );
 
-//
-
+//find tours within user radius
+//:distance(for user radius), :latlng(for user location), :unit(for miles or km)
 router
   .route(
     '/tours-within/:distance/center/:latlng/unit/:unit'
   )
   .get(tourController.getToursWithin);
 
-//
+//calculating the distance of tours and its closeness to user
+//:distance(for user radius), :latlng(for user location), :unit(for miles or km)
+router
+  .route('/distances/:latlng/unit/:unit')
+  .get(tourController.getDistances);
 
 //if there is a request to post(create) data to url, then respond with...
 router
