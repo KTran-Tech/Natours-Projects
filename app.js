@@ -26,6 +26,7 @@ app.set('views', path.join(__dirname, 'views'));
 //Serving Static Files
 app.use(
   //automatically set up path for destinated path
+  //also makes it easier to call upon css and image files
   express.static(path.join(__dirname, 'public'))
 );
 
@@ -99,7 +100,11 @@ app.use((req, res, next) => {
 //To make this route in the web work
 app.get('/', (req, res) => {
   //goes into views folder and render base.pug
-  res.status(200).render('base');
+  //also make parameter publicly available in pug template
+  res.status(200).render('base', {
+    tour: 'The Forest Hiker',
+    user: 'Jonas',
+  });
 });
 
 app.use('/api/v1/tours', tourRouter);
