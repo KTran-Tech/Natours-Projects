@@ -171,6 +171,7 @@ exports.getMonthlyPlan = catchAsync(
   }
 );
 
+//find tours within user radius
 // /tours-within/:distance/center/:latlng/unit/:unit
 // /tours-within/233/center/34.111745,-118.113491/unit/mi
 exports.getToursWithin = catchAsync(
@@ -188,14 +189,14 @@ exports.getToursWithin = catchAsync(
         )
       );
     }
-
     //if radius is 'mi' then do first calculation(based on miles), else do based on km...
     const radius =
       unit === 'mi'
         ? distance / 3963.2
         : distance / 6378.1;
 
-    //start location is within center sphere of user(their lng,lat is their location, and radius is how wide it spreads)
+    //find tours that are within user radius
+    //start location, is within center sphere of user(their lng,lat is their location, and radius is how wide it spreads)
     const tours = await Tour.find({
       startLocation: {
         $geoWithin: {
@@ -214,6 +215,54 @@ exports.getToursWithin = catchAsync(
   }
 );
 
+//calculating the distance of tours and its closeness to user
 exports.getDistances = catchAsync(
-  async (req, res, next) => {}
+  async (req, res, next) => {
+    const { latlng, unit } = req.params;
+    //Original lat & Lng 45.34345345, 23.34234234
+    const [lat, lng] = latlng.split(',');
+
+    //If neither lat or lng exist then ouput error
+    if (!lat || !lng) {
+      next(
+        new AppError(
+          'Please provide latitude and longitude in the format lat,lng.',
+          400
+        )
+      );
+    }
+    //
+    //find the distance of tours from the user
+    const distances = await Tour.aggregate([
+      {
+        $geoNear: {
+          //'near' is the starting point
+          //specify 'near' as a geoJSON
+          near: {
+            type: 'Point',
+            //multiply by 1 to convert it to numbers
+            coordinates: [lng * 1, lat * 1],
+          },
+          //[field] where all calculated distances will be stored
+          distanceField: 'distance',
+          //activates calculation, divide by a thousand
+          distanceMultiplier: 0.001,
+        },
+      },
+      {
+        //feature: to project a more organized data of the distance
+        $project: {
+          distance: 1,
+          name: 1,
+        },
+      },
+    ]);
+    //
+    res.status(200).json({
+      status: 'success',
+      data: {
+        data: distances,
+      },
+    });
+  }
 );
