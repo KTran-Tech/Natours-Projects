@@ -179,6 +179,7 @@ exports.getToursWithin = catchAsync(
     //Original lat & Lng 45.34345345, 23.34234234
     const [lat, lng] = latlng.split(',');
 
+    //If neither lat or lng exist then ouput error
     if (!lat || !lng) {
       next(
         new AppError(
