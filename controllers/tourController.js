@@ -171,19 +171,27 @@ exports.getMonthlyPlan = catchAsync(
   }
 );
 
-// '/tours-within/distance/center/:latlng/unit/:unit',
-exports.getToursWithin = (req, res, next) => {
-  const { distance, latlng, unit } = req.params;
-  //Original lat & Lng 45.34345345, 23.34234234
-  const { lat, lng } = latlng.split(',');
+// /tours-within/:distance/center/:latlng/unit/:unit
+// /tours-within/233/center/34.111745,-118.113491/unit/mi
+exports.getToursWithin = catchAsync(
+  async (req, res, next) => {
+    const { distance, latlng, unit } = req.params;
+    //Original lat & Lng 45.34345345, 23.34234234
+    const [lat, lng] = latlng.split(',');
 
-  if (!lat || !lng) {
-    next(
-      new AppError(
-        'Please provide latitude and longitude in the format lat,lng.',
-        400
-      )
-    );
+    if (!lat || !lng) {
+      next(
+        new AppError(
+          'Please provide latitude and longitude in the format lat,lng.',
+          400
+        )
+      );
+    }
+
+    const tours = await Tour.find();
+
+    res.status(200).json({
+      status: 'success',
+    });
   }
-  //
-};
+);
