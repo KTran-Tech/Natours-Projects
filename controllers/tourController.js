@@ -188,7 +188,7 @@ exports.getToursWithin = catchAsync(
       );
     }
 
-    //if radius is 'mi' then do first calculation, else do...
+    //if radius is 'mi' then do first calculation(based on miles), else do based on km...
     const radius =
       unit === 'mi'
         ? distance / 3963.2
@@ -205,6 +205,7 @@ exports.getToursWithin = catchAsync(
 
     res.status(200).json({
       status: 'success',
+      results: tours.length,
       data: {
         data: tours,
       },
