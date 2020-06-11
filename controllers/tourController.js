@@ -222,6 +222,9 @@ exports.getDistances = catchAsync(
     //Original lat & Lng 45.34345345, 23.34234234
     const [lat, lng] = latlng.split(',');
 
+    const multiplier =
+      unit === 'mi' ? 0.000621371 : 0.001;
+
     //If neither lat or lng exist then ouput error
     if (!lat || !lng) {
       next(
@@ -232,6 +235,7 @@ exports.getDistances = catchAsync(
       );
     }
     //
+    //Aggregate all tours in database
     //find the distance of tours from the user
     const distances = await Tour.aggregate([
       {
@@ -245,8 +249,8 @@ exports.getDistances = catchAsync(
           },
           //[field] where all calculated distances will be stored
           distanceField: 'distance',
-          //activates calculation, divide by a thousand
-          distanceMultiplier: 0.001,
+          //activates calculation, e.g divide by a thousand
+          distanceMultiplier: multiplier,
         },
       },
       {
