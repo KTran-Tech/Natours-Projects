@@ -188,11 +188,13 @@ exports.getToursWithin = catchAsync(
       );
     }
 
+    //if radius is 'mi' then do first calculation, else do...
     const radius =
       unit === 'mi'
         ? distance / 3963.2
         : distance / 6378.1;
 
+    //start location is within center sphere of user(their lng,lat is their location, and radius is how wide it spreads)
     const tours = await Tour.find({
       startLocation: {
         $geoWithin: {
