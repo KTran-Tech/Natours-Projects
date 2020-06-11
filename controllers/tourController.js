@@ -188,10 +188,24 @@ exports.getToursWithin = catchAsync(
       );
     }
 
-    const tours = await Tour.find();
+    const radius =
+      unit === 'mi'
+        ? distance / 3963.2
+        : distance / 6378.1;
+
+    const tours = await Tour.find({
+      startLocation: {
+        $geoWithin: {
+          $centerSphere: [[lng, lat], radius],
+        },
+      },
+    });
 
     res.status(200).json({
       status: 'success',
+      data: {
+        data: tours,
+      },
     });
   }
 );
