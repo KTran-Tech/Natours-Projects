@@ -12,9 +12,17 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
+
 // to be able to use express methods
 //app.use() is a command to tell express to use these specific tools
 const app = express();
+
+//
+
+//
+
+//
 
 //setup for view engine called pug
 app.set('view engine', 'pug');
@@ -29,6 +37,12 @@ app.use(
   //also makes it easier to call upon css and image files
   express.static(path.join(__dirname, 'public'))
 );
+
+//
+
+//
+
+//
 
 //SET SECURITY HTTP HEADERS
 app.use(helmet());
@@ -98,15 +112,8 @@ app.use((req, res, next) => {
 
 // #) ROUTES
 //To make this route in the web work
-app.get('/', (req, res) => {
-  //goes into views folder and render base.pug
-  //also make parameter publicly available in pug template
-  res.status(200).render('base', {
-    tour: 'The Forest Hiker',
-    user: 'Jonas',
-  });
-});
 
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);

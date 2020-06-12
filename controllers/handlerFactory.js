@@ -141,7 +141,9 @@ exports.getAll = (Model) =>
     //
 
     //Literally passing in the method .Find() to constructor
+
     const features = new APIFeatures(
+      //Model.find() get all data from database collection to be displayed as json
       Model.find(filter),
       req.query
     ) //the reason for why chaining work is because all of the methods returns "this"
@@ -152,7 +154,7 @@ exports.getAll = (Model) =>
 
     //
     //.explain() just gives you the stats of the query
-    const doc = await features.query
+    const doc = await features.query;
 
     // console.log(req.query);
     // console.log(req.query, queryObj);
