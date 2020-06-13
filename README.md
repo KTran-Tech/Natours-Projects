@@ -10,4 +10,4 @@ I just built most of the backend and rarely worked on the front-end for this pro
 
 ![](previewImages/1.png)
 ![](previewImages/2.png)
-![](previewImages/3.png)
+![](previewImages/3.jpg)
