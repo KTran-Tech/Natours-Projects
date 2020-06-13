@@ -6,10 +6,6 @@ exports.getOverview = catchAsync(
     // 1) Get tour data from collection
     const tours = await Tour.find();
 
-    // 2) Build Template
-
-    // 3) Render that template using tour data from 1
-
     //goes into views folder and render base.pug
     //also make argument data publicly available in pug template
     res.status(200).render('overview', {
@@ -19,10 +15,26 @@ exports.getOverview = catchAsync(
   }
 );
 
-exports.getTour = (req, res) => {
-  //goes into views folder and render base.pug
-  //also make argument data publicly available in pug template
-  res.status(200).render('tour', {
-    title: 'The Forest Hiker Tour',
-  });
-};
+//
+
+//
+
+exports.getTour = catchAsync(
+  async (req, res, next) => {
+    //It is slug(random title) because we don't know the tour's ID is and so we just look for any tours with matching slug
+    // 1) Get the data, for the requested tour (including reviews and guides)
+    const tour = await Tour.findOne({
+      slug: req.params.slug,
+    }).populate({
+      path: 'reviews',
+      fields: 'review rating user',
+    });
+
+    //goes into views folder and render base.pug
+    //also make argument data publicly available in pug template
+    res.status(200).render('tour', {
+      title: 'The Forest Hiker Tour',
+      tour,
+    });
+  }
+);
