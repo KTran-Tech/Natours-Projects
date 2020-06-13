@@ -33,7 +33,7 @@ exports.getTour = catchAsync(
     //goes into views folder and render base.pug
     //also make argument data publicly available in pug template
     res.status(200).render('tour', {
-      title: 'The Forest Hiker Tour',
+      title: `${tour.name} Tour`,
       tour,
     });
   }
