@@ -46,6 +46,7 @@ const handleJWTExpiredError = () =>
 
 // DEVELOPMENT PRODUCTION
 const sendErrorDev = (err, res) => {
+  //pass in the error statusCode (e.g 404, 400, 200, ect)
   res.status(err.statusCode).json({
     status: err.status,
     error: err,
@@ -84,9 +85,7 @@ module.exports = (err, req, res, next) => {
 
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
-  } else if (
-    process.env.NODE_ENV === 'production'
-  ) {
+  } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
 
     if (error.name === 'CastError')
