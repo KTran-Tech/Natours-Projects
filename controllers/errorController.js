@@ -86,8 +86,13 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
+    /*If your {...err} is not supported add this to your json
+        "engines": {
+        "node": ">=10.0.0"
+         } 
+    */
     let error = { ...err };
-
+    //These are only for be displayed to the console
     if (error.name === 'CastError')
       error = handleCastErrorDB(error);
     if (error.code === 11000)
@@ -98,6 +103,7 @@ module.exports = (err, req, res, next) => {
       error = handleJWTError();
     if (error.name === 'TokenExpiredError')
       error = handleJWTExpiredError();
+    //this is to be sent to postman
     sendErrorProd(error, res);
   }
 };
