@@ -6,19 +6,26 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleDuplicateFieldsDB = (err) => {
+  //Regular Expression: to find the users error causing email
   const value = err.errmsg.match(
     /(["'])(?:(?=(\\?))\2.)*?\1/
   )[0];
-  console.log(value);
   const message = `Duplicate field value: ${value}. Please use another value!`;
+  console.log(value);
+  console.log(message);
   return new AppError(message, 400);
 };
 
 const handleValidationErrorDB = (err) => {
-  //turns object into an array using Object.value() and store it there
-  const errors = Object.values(err.errors).map(
-    (element) => element.message
-  );
+  //turns object into an array using Object.value() to be able to use map(loop through it)
+  //err.errors is an object of errors
+  //for every error(element) in err.errors(now turned into an array), output the error message(element.message)
+  /*Should in the end create an array from the converted object to something like this 
+    [ 'Title must be between 4 to 150 characters',
+      'Body must be between 4 to 2000 characters' ]
+  */ const errors = Object.values(
+    err.errors
+  ).map((element) => element.message);
 
   const message = `Invalid input data. ${errors.join(
     '. '

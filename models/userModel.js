@@ -64,7 +64,9 @@ const userSchema = new mongoose.Schema({
 //its a perfect time to manipulate data through middleware, when data is sent before being entirely saved
 //invoke this function 'pre' before, 'save' saving the data to the database
 userSchema.pre('save', async function (next) {
-  //if password has not been modified then call next middleware
+  /*If password is not modified(empty password  string or not updated) then call next() middleware, else if it is
+  modified(meaning a newly created document, with users password, or updated) 
+  then encrypt the new password*/
   if (!this.isModified('password')) return next();
   //encrypt password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
