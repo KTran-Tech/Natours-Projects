@@ -19,6 +19,7 @@ const sendEmail = require('../utils/email');
 
 const signToken = (id) => {
   //signing a signature token, creates new token based on these mixes of arguments passed in
+  //generate token with user Id( from database) and secret(from server, in this case vsCode)
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -36,6 +37,9 @@ const createSendToken = (user, statusCode, res) => {
   //
 
   //
+
+  //persist the token as 'jwt' in cookie, with expiration date
+  //cookie modification
   const cookieOptions = {
     expires: new Date(
       Date.now() +
@@ -50,6 +54,7 @@ const createSendToken = (user, statusCode, res) => {
   };
   //this means cookie will only be sent on an encrypted connection (https)
   if (process.env.NODE_ENV === 'production')
+    //set cookieOptions variable to be secure
     cookieOptions.secure = true;
   //attaching cookie to response object
   //making token more secure by storing it in cookie for user
@@ -114,6 +119,8 @@ exports.login = catchAsync(async (req, res, next) => {
     email,
   }).select('+password');
 
+  /*The 'correctPassword' Instance Method is created by you 
+  in the UserSchema ready to be used anytime */
   if (
     !user ||
     !(await user.correctPassword(

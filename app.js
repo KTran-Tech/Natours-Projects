@@ -129,6 +129,9 @@ app.all('*', (req, res, next) => {
 });
 
 //if anyone of the valid routes return an error then it will have to be redirected to this
+/*Note: The reason why we don't use catchAsync for some middleware
+is because is the catchAsync function is only meant for Express Route
+Handlers and are not pointing to our Schema document to begin with*/
 app.use(globalErrorHandler);
 
 module.exports = app;

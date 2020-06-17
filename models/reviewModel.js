@@ -77,6 +77,9 @@ reviewSchema.pre(/^find/, function (next) {
 //
 
 //pass in specific tour Id given by user, this function will be called (below).
+/*Note: The reason why we don't use catchAsync for these middleware
+is because is the catchAsync function is only meant for Express Route
+Handlers and are not pointing to our Schema document to begin with*/
 reviewSchema.statics.calcAverageRatings = async function (
   tourId
 ) {
@@ -124,6 +127,9 @@ reviewSchema.post('save', function () {
 //findByIdAndUpdate
 //findByIdAndDelete
 /* Before findOneAndUpdate()/Delete() reviews in database do... */
+/*Note: The reason why we don't use catchAsync for these middleware
+is because is the catchAsync function is only meant for Express Route
+Handlers and are not pointing to our Schema document to begin with*/
 reviewSchema.pre(/^findOneAnd/, async function (next) {
   //This gets the current document/Schema passed in
   this.r = await this.findOne();

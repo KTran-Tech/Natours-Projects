@@ -29,6 +29,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
     minlength: 8,
+    /*Makes sure password is never outputted to user through 
+    getAllUsers or getUsers, its a security feature*/
     select: false,
   },
   passwordConfirm: {
@@ -63,6 +65,9 @@ const userSchema = new mongoose.Schema({
 
 //its a perfect time to manipulate data through middleware, when data is sent before being entirely saved
 //invoke this function 'pre' before, 'save' saving the data to the database
+/*Note: The reason why we don't use catchAsync for these middleware
+is because is the catchAsync function is only meant for Express Route
+Handlers and are not pointing to our Schema document to begin with*/
 userSchema.pre('save', async function (next) {
   /*If password is not modified(empty password  string or not updated) then call next() middleware, else if it is
   modified(meaning a newly created document, with users password, or updated) 
@@ -78,6 +83,9 @@ userSchema.pre('save', async function (next) {
 
 //its a perfect time to manipulate data through middleware, when data is sent before being entirely saved
 //invoke this function 'pre' before, 'save' saving the data to the database
+/*Note: The reason why we don't use catchAsync for these middleware
+is because is the catchAsync function is only meant for Express Route
+Handlers and are not pointing to our Schema document to begin with*/
 userSchema.pre('save', function (next) {
   //if password has not been changed or the document has just been created, then move on to the next middleware and ignore this one
   if (!this.isModified('password') || this.isNew)
@@ -90,6 +98,9 @@ userSchema.pre('save', function (next) {
 
 /*invoke this middleware before any 'find' commands like User.findByIdAndUpdate() is
 done to the database */
+/*Note: The reason why we don't use catchAsync for these middleware
+is because is the catchAsync function is only meant for Express Route
+Handlers and are not pointing to our Schema document to begin with*/
 userSchema.pre(/^find/, function (next) {
   //Find only users that has "active" property set to true
   this.find({ active: { $ne: false } });
@@ -100,10 +111,13 @@ userSchema.pre(/^find/, function (next) {
 
 //
 
-//METHODS
+//INSTANCE METHODS
 
 //these tools are built-in with mongoose so you could use anytime
 //You have to specify to the schema that you are building a method
+/*Note: The reason why we don't use catchAsync for these middleware
+is because is the catchAsync function is only meant for Express Route
+Handlers and are not pointing to our Schema document to begin with*/
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
