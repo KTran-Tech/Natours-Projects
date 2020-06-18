@@ -143,11 +143,14 @@ exports.protect = catchAsync(
   async (req, res, next) => {
     // 1) Get token and check if its there
     let token;
+    /*checks to see if the header has authorization mode set up
+    and see if it also starts with 'Bearer'*/
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith('Bearer')
     ) {
-      // .split('') will will remove the space and create an array of the two
+      // .split('') will always remove the space and create an array of the two
+      //we pick the [1] because it holds the token we want
       token = req.headers.authorization.split(' ')[1];
     }
     //if the token doesnt not exist
@@ -159,12 +162,13 @@ exports.protect = catchAsync(
         )
       );
     }
-    // 2) Verifies users token vs the server's JWT_SECRET (COMPARING THEM)
+    // 2) Verifies users token with the server's JWT_SECRET (COMPARING THEM)
     //if verification fails then the program stops and throws and error
     //if successful, it logs the destructured token
     /* { id: '5ed5786cf61bae4d4ad723b6',
         iat: 1591048302,
         exp: 1598824302 } */
+    //jwt doesn't have its own promise handler so this will do
     const decoded = await promisify(jwt.verify)(
       token,
       process.env.JWT_SECRET
@@ -185,7 +189,7 @@ exports.protect = catchAsync(
     }
 
     // 4) Check if user changed password after the token was issued
-    //iat stands for token 'ISSUED AT'
+    //iat stands for token 'ISSUED AT', basically an entire date()
     if (
       currentUser.changedPasswordAfter(decoded.iat)
     ) {
@@ -198,6 +202,7 @@ exports.protect = catchAsync(
     }
 
     //If none of the above is true, then grant access to protected route down below
+    //setting user to id for later use
     req.user = currentUser;
     next();
   }
