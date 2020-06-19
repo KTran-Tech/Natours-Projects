@@ -20,6 +20,11 @@ const sendEmail = require('../utils/email');
 const signToken = (id) => {
   //signing a signature token, creates new token based on these mixes of arguments passed in
   //generate token with user Id( from database) and secret(from server, in this case vsCode)
+  /*Token will be generated based on user info, if it were to be sent back to server
+  and somehow the secret has been changed then it will know because it also 
+  has its own secret stored in the server which could not be changed.
+  e.g would be someone trying to change user--> admin, but in order
+  to do that you also have to change the servers SECRET*/
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -40,6 +45,7 @@ const createSendToken = (user, statusCode, res) => {
 
   //persist the token as 'jwt' in cookie, with expiration date
   //cookie modification
+  //90days----> miliseconds(formula: 24*60*60*1000)
   const cookieOptions = {
     expires: new Date(
       Date.now() +
@@ -203,6 +209,10 @@ exports.protect = catchAsync(
 
     //If none of the above is true, then grant access to protected route down below
     //setting user to id for later use
+    /*This is important because it sets up the user info for the 
+    rest of the express application without having to get the user
+    by id over and over. It is so that you can use the currently 
+    logged in user's info*/
     req.user = currentUser;
     next();
   }
@@ -213,6 +223,8 @@ exports.restrictTo = (...roles) => {
   //returns a middleware function that has access to the roles parameter
   return (req, res, next) => {
     // roles ['admin', 'lead-guide'], if role="user" then you don't have permission
+    /*for more info about 'req.user' take a look at authController
+   .protect() function*/
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError(
@@ -351,6 +363,8 @@ exports.resetPassword = catchAsync(
 exports.updatePassword = catchAsync(
   async (req, res, next) => {
     // 1) Get user from collection
+    /*for more info about 'req.user' take a look at authController
+   .protect() function*/
     const user = await User.findById(
       req.user.id
     ).select('+password');

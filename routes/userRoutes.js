@@ -30,12 +30,16 @@ router.patch(
   authController.updatePassword
 );
 
+//set param ID to current logged in user Id so they don't have to do it manually 
+//get user along with their info based on ID
+//This is so that they will have to get their info to see what they want to change/update
 router.get(
   '/me',
   userController.getMe,
   userController.getUser
 );
 
+//After they know what they want to change they call upon this route
 router.patch('/updateMe', userController.updateMe);
 
 router.delete('/deleteMe', userController.deleteMe);

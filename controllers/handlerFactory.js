@@ -87,7 +87,7 @@ exports.createOne = (Model) =>
 //
 
 //
-
+//popOptions is just another option to pass in populate()
 exports.getOne = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
     //

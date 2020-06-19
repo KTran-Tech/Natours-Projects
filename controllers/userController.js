@@ -11,7 +11,7 @@ const factory = require('./handlerFactory');
 
 // Functions and Methods
 
-//'...allowedFields' is an array containing all arguments passed
+//'...allowedFields' is an array created by default containing all arguments passed
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   //If the users 'obj' req.body contain the required fields from the array 'allowedFields', then create new object that includes propertie name equal to field names
@@ -38,6 +38,10 @@ const filterObj = (obj, ...allowedFields) => {
 // Update User Data
 
 exports.getMe = (req, res, next) => {
+  //If you are logged then req.user.id should already be available
+  //set the params id up so you dont have to manually add it
+  /*for more info about 'req.user' take a look at authController
+  .protect() function*/
   req.params.id = req.user.id;
   next();
 };
@@ -95,6 +99,9 @@ exports.updateMe = catchAsync(
 exports.deleteMe = catchAsync(
   async (req, res, next) => {
     //disabling the user by setting "active" property to false
+    /* Note: By setting it to 'active: false', in order to query and 
+    getAll() users with ONLY 'active: true' you have to already
+    set it to '.find({active: true})', in your User.Schema Mode*/
     await User.findByIdAndUpdate(req.user.id, {
       active: false,
     });

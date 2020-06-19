@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     ],
   },
   photo: String,
+  //To become admin you have to change it directly in the DB
   role: {
     type: String,
     enum: ['user', 'guide', 'lead-guide', 'admin'],
@@ -51,6 +52,8 @@ const userSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: true,
+    /*Makes sure 'active' property is never outputted to user through 
+    getAllUsers or getUsers*/
     select: false,
   },
 });
