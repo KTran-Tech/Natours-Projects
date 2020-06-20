@@ -138,8 +138,10 @@ const tourSchema = new mongoose.Schema(
     //Referenced DataSet through Object Id
     guides: [
       {
+        //special referencing command
+        //This expects the 'type' to be a MongoDB document object Id (basically userId)
         type: mongoose.Schema.ObjectId,
-        //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
+        //referencing the userModel, the name e.g "const User = mongoose.model('User', userSchema);" of the User Schema Model
         ref: 'User',
       },
     ],

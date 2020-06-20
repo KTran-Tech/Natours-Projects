@@ -15,8 +15,9 @@ const reviewSchema = mongoose.Schema(
     //Tells you what tour the review belongs to
     tour: {
       //special referencing command
+      //This expects the 'type' to be a MongoDB document object Id (basically userId)
       type: mongoose.Schema.ObjectId,
-      //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
+      //referencing tourModel, the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
       ref: 'Tour',
       required: [
         true,
@@ -25,9 +26,9 @@ const reviewSchema = mongoose.Schema(
     },
     //Tells you which user left the review
     user: {
-      //This expects the 'type' to be a MongoDB Id
+      //This expects the 'type' to be a MongoDB document object Id (basically userId)
       type: mongoose.Schema.ObjectId,
-      //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
+      //referencing the userModel, the name e.g "const User = mongoose.model('User', userSchema);" of the User Schema Model
       ref: 'User',
       required: [true, 'Review must belong to a user'],
     },
