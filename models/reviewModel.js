@@ -25,6 +25,7 @@ const reviewSchema = mongoose.Schema(
     },
     //Tells you which user left the review
     user: {
+      //This expects the 'type' to be a MongoDB Id
       type: mongoose.Schema.ObjectId,
       //referencing the name. e.g "const Tour = mongoose.model('Tour', tourSchema);" of the Tour Schema Model
       ref: 'User',
